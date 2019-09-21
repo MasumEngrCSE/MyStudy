@@ -1,0 +1,20 @@
+Using 	System.Data;
+Using 	System.Data.Common;
+Using 	System.Data.SQLClient;
+Using 	System.Data.OracleClient;
+Using 	System.Data.ODBC;
+
+
+Using 	System.Data.SQLClient;
+----------------------------------------
+Sql Connection --- SQL data
+Sql Command --- SQL data  		-- Inser, Update, Delete
+Sql DataReader --- SQL data		-- SELECT
+Sql DataAdapter --- SQL data 	-- SELECT
+Sql DataSet --- SQL data 		--  Adapter take data and transfer in DataSet
+
+
+
+For SQL SERVER
+<add name="MyCon" connectionString="User Id = sa; Password = ; Database =; DataSource = " providerName="System.Data.SqlClient"
+

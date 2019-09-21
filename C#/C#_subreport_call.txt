@@ -1,0 +1,8 @@
+ReportDocument objRpt = new RptPreviousMR();
+objRpt.SetDatabaseLogon("sa", "12345", "RMISDB", cnn.Database.ToString());
+               
+objRpt.SetParameterValue("@p_date", Convert.ToDateTime(txtdate.Value));
+objRpt.SetParameterValue("@p_date", Convert.ToDateTime(txtdate.Value), "RptPreviousMR_office.rpt");
+
+crystalReportViewer1.ReportSource = objRpt;
+crystalReportViewer1.Refresh();

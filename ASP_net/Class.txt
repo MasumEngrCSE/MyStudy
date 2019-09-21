@@ -1,0 +1,138 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace ConsoleApplication3
+{
+    class Car
+    {
+        private string _Name;
+        private string _ModelNo;
+        private int _Nod;
+        private string _Color;
+
+        public string Name
+        {
+            get
+            {
+                return _Name;
+            }
+            set
+            {
+                _Name = value;
+            }
+        }
+
+        public string ModelNo
+        {
+            get
+            {
+                return _ModelNo;
+            }
+            set
+            {
+                _ModelNo = value;
+            }
+        }
+        public int Nod
+        {
+            get
+            {
+                return _Nod;
+            }
+            set
+            {
+                _Nod = value;
+            }
+        }
+        public string Color
+        {
+            get
+            {
+                return _Color;
+            }
+            set
+            {
+                _Color = value;
+            }
+        }
+
+    }
+}
+
+
+
+
+Anather 2 Class
+
+sing System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace ConsoleApplication3
+{
+    class KTI
+    {
+        private int _Age;
+
+        public int Age
+        {
+            get
+            {
+                return _Age;
+            }
+            set
+            {
+                _Age = value;
+            }
+        }
+    }
+    
+    class MTI
+    {
+        private string _Area;
+        
+        public string Area
+        {
+            get
+            {
+                return _Area;
+            }
+            set
+            {
+                _Area = value;
+            }
+        }
+    }
+}
+
+
+program..........
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace ConsoleApplication3
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {            Car c = new Car();
+            c.Name = "BMW";
+            c.ModelNo = "X5";
+            c.Nod = 4;
+            c.Color = "Black";
+            Console.WriteLine("\n\t\tMy Car's Specification");
+            Console.WriteLine("\t\t_______________________");
+            Console.WriteLine("\n\t\tThe Car is " + c.Name);
+            Console.WriteLine("\n\t\tModel No is " + c.ModelNo);
+            Console.WriteLine("\n\t\tNumber of Door is " + c.Nod);
+            Console.WriteLine("\n\t\tColor is " + c.Color);
+            Console.WriteLine("\n\t\tWhat U think about the car??");
+            Console.ReadLine();
+
+        }
+    }
+}
+

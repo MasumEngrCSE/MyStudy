@@ -1,0 +1,28 @@
+using System.Configuration;
+using System.Data.SqlClient;
+using System.Data;
+
+-----------------------------
+
+
+string sql_con = ConfigurationManager.ConnectionStrings["myerpConnectionString"].ConnectionString;
+        string sql = @"select * from Bank_check";
+
+        SqlConnection myConnection = new SqlConnection(sql_con);
+        SqlCommand myCommand = new SqlCommand(sql, myConnection);
+        myCommand.CommandType = CommandType.Text;
+        myConnection.Open();
+        using (SqlDataReader myReader = myCommand.ExecuteReader())
+        {
+            if (myReader.HasRows)
+            {
+
+                while (myReader.Read())
+                {
+                    // _Bank_check_list.Add(FillDataRecord(myReader));
+                    TextBox4.TemplateControl = myReader[0];
+
+                }
+            }
+            myReader.Close();
+        }

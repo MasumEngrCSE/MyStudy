@@ -1,0 +1,1 @@
+ btnNewBank.Attributes.Add("onclick", "window.open('frmBankEntry.aspx',null,'height=400, width=600,status= no, resizable= no, scrollbars=no, toolbar=no,location=no,menubar=no ');");

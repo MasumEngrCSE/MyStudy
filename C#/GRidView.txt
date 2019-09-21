@@ -1,0 +1,55 @@
+
+--------------------Name:Inser by loop
+                    int i = 0;
+                    cnn.Open();
+                    while (dataGridView1.Rows.Count - 1 > i)
+                    {
+                        DataGridViewRow rr = dataGridView1.Rows[i];
+                        //MessageBox.Show(rr.Cells[0].Value.ToString());
+
+                        sql = @"INSERT INTO purches_dtl(pid_mst,pid_item,rate,qty,unit,taka) 
+                                                    values(" + v_index + "," + rr.Cells[0].Value + ",'" + rr.Cells[2].Value + "','" + rr.Cells[3].Value + "','" + rr.Cells[4].Value + "','" + rr.Cells[5].Value + "') ";
+                        scmd.CommandText = sql;
+
+                        scmd.ExecuteNonQuery();
+
+                        i = i + 1;
+                    }
+
+-------------------Name:column add 
+	    dataGridView1.Columns.Clear();
+            dataGridView1.Width = this.Width - 200;
+            dataGridView1.Columns.Add("Code", "Item Code");
+            dataGridView1.Columns.Add("Item", "Item Nmae");
+            dataGridView1.Columns.Add("Desc","Description");
+
+            DataGridViewColumn col1 = dataGridView1.Columns[0];
+            DataGridViewColumn col2 = dataGridView1.Columns[1];
+            DataGridViewColumn col3 = dataGridView1.Columns[2];
+            col1.Width = 60;
+            col1.Visible = false;
+            col2.Width = 200;
+            col3.Width = 300;
+
+-----------------------Name:C# Datagridview Checkbox Checked Event:
+
+private void dtgSortedMessage_CellClick(object sender, DataGridViewCellEventArgs e)
+{
+
+	if (dtgSortedMessage.Columns[e.ColumnIndex].Name == "dataGridViewCheckBoxColumn1")
+	{
+
+		bool isChecked = (bool)dtgSortedMessage[e.ColumnIndex, e.RowIndex].EditedFormattedValue;
+
+		if (!isChecked)
+		{
+			MessageBox.Show(dtgSortedMessage.Rows[e.RowIndex].Cells[3].Value.ToString());
+		}
+
+
+	}
+}
+-----------------------Name:
+-----------------------Name:
+-----------------------Name:
+-----------------------Name:

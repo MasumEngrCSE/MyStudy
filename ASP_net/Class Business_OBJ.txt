@@ -1,0 +1,70 @@
+using System;
+using System.Data;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.Data.SqlClient;
+
+/// <summary>
+/// Summary description for Business_OBG
+/// </summary>
+public class Business_OBG
+{
+    SqlConnection cn = new SqlConnection(ConfigurationManager.ConnectionStrings["MyCon"].ConnectionString);
+	public Business_OBG()
+	{
+        
+	}
+   
+ public void InsertEmp(String empname, String address, string phone, String email)
+    {
+        SqlCommand cmd = new SqlCommand("Insert_Emp",cn);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.AddWithValue("@emp_name", empname);
+        cmd.Parameters.AddWithValue("@adress", address);
+        cmd.Parameters.AddWithValue("@phone", phone);
+        cmd.Parameters.AddWithValue("@email", email);
+        cn.Open();
+        cmd.ExecuteNonQuery();
+        cn.Close();
+    }
+
+
+    public void UpdateEmp(int EmpId, string empname, string address, string phone, String email)
+    {
+        SqlCommand cmd = new SqlCommand("Emp_Update", cn);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.AddWithValue("@Emp_Id", EmpId);
+        cmd.Parameters.AddWithValue("@EName", empname);
+        cmd.Parameters.AddWithValue("@Address", address);
+        cmd.Parameters.AddWithValue("@Phone", phone);
+        cmd.Parameters.AddWithValue("@Email", email);
+        cn.Open();
+        cmd.ExecuteNonQuery();
+        cn.Close();
+    }
+
+    public void DeleteEmp(int EmpId)
+    {
+        SqlCommand cmd = new SqlCommand("Emp_Del", cn);
+        cmd.CommandType= CommandType.StoredProcedure;
+        cmd.Parameters.AddWithValue("@Emp_Id", EmpId);
+        cn.Open();
+        cmd.ExecuteNonQuery();
+        cn.Close();
+           }
+
+
+    public DataSet MyDs()
+    {
+        SqlDataAdapter da = new SqlDataAdapter("Select * from testEmp", cn);
+        DataSet ds = new DataSet();
+        da.Fill(ds, "testEmp");
+        return ds;
+    }
+
+}

@@ -1,0 +1,3 @@
+            TextObject textObject;
+            textObject = rd.ReportDefinition.Sections[1].ReportObjects["txtDate"] as TextObject;
+            textObject.Text = DateBetween;

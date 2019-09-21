@@ -1,0 +1,15 @@
+        
+
+if (FileUpload2.HasFile)
+        {
+             string _topath = @"D:\mfile\" + FileUpload2.FileName;
+            string imafefolder = "temp";
+            string savepath;
+            string savefile;
+            savepath = Path.Combine(Request.PhysicalApplicationPath, imafefolder);
+            savefile = Path.Combine(savepath, FileUpload2.FileName);
+            FileUpload2.SaveAs(savefile);
+            File.Copy(savefile, @_topath,true);
+            File.Delete(savefile);
+
+        }

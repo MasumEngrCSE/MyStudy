@@ -1,0 +1,198 @@
+            string Qry = "select pid,Acc_Code,ClassName from Acc_Class";
+            SqlDataAdapter da = new SqlDataAdapter(Qry, DbConnection.cnn_string);
+
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            GridView1.DataSource = dt;
+            GridView1.DataBind();
+------------------Remove row
+tbl1.Rows.RemoveAt(a);
+-------------------filtering with select method in DataTable :
+	DataTable tbldiv = new DataTable();
+    	DataTable tbldis = new DataTable();
+    	protected void Page_Load(object sender, EventArgs e)
+    	{
+        	if (!IsPostBack)
+        	{
+            	//----------------
+            	tbldiv.Columns.Add("Id", typeof(int));
+            	tbldiv.Columns.Add("Name", typeof(String));
+            	v_divload();
+            	//----------------
+            	tbldis.Columns.Add("dID", typeof(int));
+            	tbldis.Columns.Add("DistrictName", typeof(String));
+            	tbldis.Columns.Add("dvID", typeof(int));
+            	v_disload();
+        	}
+        	else
+        	{
+            	tbldiv = (DataTable)ViewState["tblcombo1"];
+            	tbldis = (DataTable)ViewState["tbldis"];
+        	}
+        	ViewState["tblcombo1"] = tbldiv;
+        	ViewState["tbldis"] = tbldis;
+    	}
+	private void v_divload()
+    	{
+        SqlConnection cnn = new SqlConnection(constr); ;
+
+        //--------------Client:
+
+        dbcommand = new SqlCommand();
+        dbcommand.Connection = cnn;
+        sql = "SELECT dvID,DivisionName  FROM t_Division";
+        dbcommand.CommandText = sql;
+        cnn.Open();
+        objadapter = new SqlDataAdapter();
+        objadapter.SelectCommand = dbcommand;
+        objadapter.Fill(tbldiv);
+        DropDownList1.DataSource = tbldiv;
+        DropDownList1.DataTextField = "DivisionName";
+        DropDownList1.DataValueField = "dvID";
+        DropDownList1.DataBind();
+    	}
+    	private void v_disload()
+    	{
+        SqlConnection cnn = new SqlConnection(constr); ;
+
+        //--------------Client:
+
+        dbcommand = new SqlCommand();
+        dbcommand.Connection = cnn;
+        sql = "select dID,DistrictName,dvID  from t_District";
+        dbcommand.CommandText = sql;
+        cnn.Open();
+        //work with data adapter----------------
+        objadapter = new SqlDataAdapter();
+        //objtable = new DataTable();
+        objadapter.SelectCommand = dbcommand;
+        objadapter.Fill(tbldis);
+        DropDownList2.DataSource = tbldis;
+        DropDownList2.DataTextField = "DistrictName";
+        DropDownList2.DataValueField = "dID";
+        DropDownList2.DataBind();
+    	}
+	---
+        DataRow[] rows = tbldis.Select(" dvID=" + DropDownList1.SelectedValue);
+        DataTable dt=new DataTable() ;
+        dt.Columns.Add("dID", typeof(int));
+        dt.Columns.Add("DistrictName", typeof(String));
+        dt.Columns.Add("dvID", typeof(int));
+
+        foreach (DataRow thisRow in rows)
+        {
+            dt.Rows.Add(thisRow.ItemArray);
+        }
+
+        DropDownList2.DataSource = dt;
+        DropDownList2.DataBind();
+-------------------
+Databale And Gridview :
+------------------------------------------------------------
+DataTable Apply (aggreate functions,Row Edit,Reordaring datatable SL, and bind to GridView)
+-----------------------------------------------------
+    ----Event of RowDeleting GridView:
+    protected void GridView3_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+
+	----Row Index Get:
+        int rowIndex = Convert.ToInt32(e.RowIndex);
+
+	---Row Index Cel Value Get:
+        string v_val = GridView3.Rows[rowIndex ].Cells[1].Text;
+
+	-------Delete row:
+        tbl1.Rows.RemoveAt(rowIndex );
+
+	------Reordaring datatable sl:
+        int v_sl=1;
+	--------Reordaring datatable SL
+        foreach (DataRow dtRow in tbl1.Rows)
+        {
+           ---Edit row Value : 
+            dtRow["sl"] = v_sl;
+	   -------------------------
+            v_sl += 1;
+        }
+
+	------Bind datatabale to GridView:
+        GridView3.DataSource = tbl1;
+        GridView3.DataBind();
+
+	----------Apply Aggregate funtion in datatable:
+        txt_tot_debit.Text = tbl1.Compute("sum(Debit)", "").ToString();
+        txt_tot_credit.Text = tbl1.Compute("sum(Credit)", "").ToString();
+
+
+    }
+---------------------------
+----------------------------------------------------------
+
+Sometimes we want to do temporary operations on our data on the page and finally store it into database for this we can use following procedure :
+ 
+1) Create a temporary table treating function :
+ 
+public DataTable CreateTemptable()
+      {
+        DataTable dtAccessorial = new DataTable();
+        dtAccessorial.Columns.Add("PK_ACCESSORIAL_MAP_ID", typeof(int));
+        dtAccessorial.Columns.Add("ACCESSORIAL_TYPE", typeof(string));
+        dtAccessorial.Columns.Add("ACCESSORIAL_VALUE", typeof(int));
+        dtAccessorial.Columns.Add("ACCESSORIAL_CHARGES", typeof(double));
+        dtAccessorial.Columns.Add("INSERT_UPDATE_FLAG", typeof(int));
+        dtAccessorial.Columns.Add("OTHER_FLAG", typeof(int));
+        dtAccessorial.Columns.Add("ROW_STATUS", typeof(int));
+        return dtAccessorial;
+      }
+ 
+2) Create a session variable on page load :
+ 
+           Session["dtAccessorialCharges"] = CreateTemptable();
+ 
+3) Fill default values into session variable :
+ 
+Session["dtAccessorialCharges"] =  Datatable( Containing defalut values)
+ 
+or using the following approach :
+ 
+      DataTable dt = (DataTable)Session["dtAccessorialCharges"];
+      DataRow _dr = dt.NewRow();
+  _dr["PK_ACCESSORIAL_MAP_ID"] = int.Parse(hidAccessorialNewPK.Value) + 1;
+      _dr["ACCESSORIAL_TYPE"] = txtOther.Text;
+      _dr["ACCESSORIAL_VALUE"] = cmbAccessorialType.SelectedValue;
+      _dr["ACCESSORIAL_CHARGES"] = txtAccessorialCharge.Text.Trim().TrimStart('$');
+      _dr["INSERT_UPDATE_FLAG"] = 0;
+      _dr["OTHER_FLAG"] = 0;
+      _dr["ROW_STATUS"] = 1;
+      dt.Rows.Add(_dr);
+      Session["dtAccessorialCharges"] = dt;
+4) Now if you want you can do operations on this datatable :
+ 
+    DataTable dt = (DataTable)Session["dtAccessorialCharges"];
+    DataRow[] dr = dt.Select("PK_ACCESSORIAL_MAP_ID = " + AccessorialID);
+    DataRow dtRow = dr[0];
+    dtRow["ROW_STATUS"] = 2;
+    Session["dtAccessorialCharges"] = dt;
+ 
+5) And finally you can save it like :
+ 
+        private void InsertAccessorial(int ShipmentID, DataTable dtAccessorial, SqlTransaction objTrans)
+        {
+          
+            if (dtAccessorial.Rows.Count > 0)
+            {
+                foreach (DataRow dtRow in dtAccessorial.Rows)
+                {
+         // Put your data insertion code here to insert row 1 by one
+         // or can insert all at a time what ever you want.              
+                }
+            }
+        }
+ 
+This code is very useful when you are doing insert and delete operations on a grid frequently and at the end you want to save only active rows into your database
+
+
+Related Tags:
+Database
+
+Author: Manish Tewari 

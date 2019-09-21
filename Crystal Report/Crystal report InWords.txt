@@ -1,0 +1,36 @@
+
+numbervar RmVal:=0; 
+numbervar Amt:=0; 
+numbervar pAmt:=0; 
+stringvar InWords :=""; 
+Amt := floor(Sum ({AccVoucherPreview.DR})); 
+
+
+if Amt > 10000000 then RmVal := truncate(Amt/10000000); 
+if Amt = 10000000 then RmVal := 1; 
+if RmVal = 1 then 
+InWords := InWords + " " + towords(RmVal,0) + " crore" 
+else 
+if RmVal > 1 then 
+InWords := InWords + " " + towords(RmVal,0) + " crores";
+
+Amt := Amt - Rmval * 10000000; 
+if Amt > 100000 then RmVal := truncate(Amt/100000); 
+if Amt = 100000 then RmVal := 1; 
+if Amt = 0 then RmVal := 0;
+if RmVal >= 1 then 
+InWords := InWords + " " + towords(RmVal,0) + " lacs";
+
+Amt := Amt - Rmval * 100000; 
+if Amt > 0 then InWords := InWords + " " + towords(truncate(Amt),0); 
+
+
+pAmt := (Sum ({AccVoucherPreview.DR})- floor(Sum ({AccVoucherPreview.DR}))) * 100; 
+if pAmt > 0 then 
+InWords := InWords + " and " + towords(pAmt,0) + " Poisha only" 
+else 
+InWords := InWords + " Taka only"; 
+
+InWords :=Replace(InWords,'-',' ');
+
+propercase(InWords)

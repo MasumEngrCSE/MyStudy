@@ -1,0 +1,32 @@
+
+You can use the gmail to send mail and for the subject, body , to, from you can pass the database table:
+
+
+
+
+using System.Net.Mail;
+using System.Net;
+protected void BtnSendMail_Click(object sender, EventArgs e)
+   {
+     string UserName = "";
+     string PassWord="";
+     string Reciever = "reciever@gmail.com";
+ 
+     NetworkCredential loginInfo = new NetworkCredential(UserName, PassWord);
+     MailMessage msg = new MailMessage();
+     msg.From = new MailAddress(UserName);
+     msg.To.Add(new MailAddress(Reciever);
+     msg.Subject = txtSubject.Text.ToString();
+     msg.Body = txtmsg.Text.ToString();
+     msg.IsBodyHtml = true;
+     SmtpClient client = new SmtpClient("smtp.gmail.com");
+     client.EnableSsl = true;
+     client.UseDefaultCredentials = false;
+     client.Credentials = loginInfo;
+     client.Send(msg);
+ 
+     Response.Write("<script>alert('mail sent')</script>");
+ 
+   }
+
+here in the code where i show with yellow mark you have to pass the database field value instead of local values of textboxex..

@@ -1,0 +1,20 @@
+----------------Title:Image Show in a hyperlink
+Hyperlink in a report
+
+Figure 2: Instead of the image, you
+can show a hyperlink to the image.
+
+One possible alternative would be to show a hyperlink in place of the image, as in Figure 2. The person viewing the report would then click on the hyperlink to view the image. It's not an ideal solution (and of course it won't work for printed copies of the report), but it might meet your needs in some cases.
+
+To achieve this, proceed as follows:
+
+    1.Drop a text object onto the report. Set the text to something like "Click here to see photo".
+    2.Right-click on the object , choose Format Text, and go to the Hyperlink page.
+    3.Set the hyperlink type to "A file". Click the conditional formatting button next to the Filename box.
+    4.In the formula editor, create a formula that returns the relevant filename or URL (again, this will typically return the contents of the relevant database field). Come out of the formula editor.
+    5.Format the text object to make it look like a hyperlink (for example, color it blue and underline it).
+
+Now, when the user clicks on the text object, the appropriate image will appear, either in the user's web browser (if the field contains a URL) or in their default image viewing application (if it contains a filename).
+
+Instead of a label, you can use a field or a formula as the hyperlink. That way, you can have it show variable text, such as the name of the person whose photo you are showing, rather than something like "Click here to see photo". If that's what you want, just drop the appropriate field or formula object in the report and create the hyperlink as described above.
+-----------------------------------------

@@ -1,0 +1,5 @@
+string url = "Default2.aspx?ID=1&cat=test";
+string fullURL = "window.open('" + url + "', '_blank',
+ 	'height=250,width=280,status=yes,toolbar=no,menubar=no,
+	location=no,scrollbars=yes,resizable=no,titlebar=no' );";
+Button1.Attributes.Add("OnClick", fullURL);

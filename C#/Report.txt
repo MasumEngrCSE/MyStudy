@@ -1,0 +1,47 @@
+
+----------------Title:Way of Pass Value from C# form to Crystal Report (Text Field)
+
+TextObject txt_myadd = (TextObject)rpt.ReportDefinition.ReportObjects["txt_myadd"];
+txt_myadd .text="My value";
+----------------Title:Procedure Paramiter call
+  rpt.Load(reportPath);
+    rpt.SetParameterValue(0, Convert.ToInt32(50));
+    rpt.SetParameterValue(1, Convert.ToBoolean(false));
+
+----------------Title:Call from form:
+
+                ReportDocument cd;
+                string user = "sa";
+                string pward = "12345";
+                string constr = ConfigurationSettings.AppSettings["Cnn"];
+                SqlConnection cnn = new SqlConnection(constr);
+                cd = new CrystalReport1();
+                cd.RecordSelectionFormula = "{purches_mst.pid}=" + txt_sales_id.Text + "";
+                cd.SetDatabaseLogon(user, pward, "hsales_db", cnn.Database.ToString());
+                crystalReportViewer1.ReportSource = cd;
+                crystalReportViewer1.Width = this.Width - 200;
+                crystalReportViewer1.Height = this.Height - 100;
+                crystalReportViewer1.Left = this.Left + 100;
+                crystalReportViewer1.Visible = true;
+                crystalReportViewer1.Refresh();
+
+----------------Title:Report using datatable & Call from form
+            string sql;
+            string constr = @"Data Source=localhost\SQL2008DB;Initial Catalog=testdb;Persist Security Info=True;User ID=sa;Password=12345";
+            SqlConnection cnn = new SqlConnection(constr);
+            sql = "select * from employee";
+            if (textBox1.Text != "")
+            {
+                sql = sql+ " where empid =" + textBox1.Text + "";
+            }
+            SqlDataAdapter SDA = new SqlDataAdapter(sql,cnn);
+            DataSet1 dst = new DataSet1();
+            SDA.Fill(dst, "tmp_employee");
+            ReportDocument crd = new CrystalReport_using_datatable();
+            crd.SetDataSource(dst);
+            crystalReportViewer1.ReportSource = crd;
+----------------Title:
+----------------Title:
+----------------Title:
+----------------Title:
+----------------Title:

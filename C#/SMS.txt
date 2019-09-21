@@ -1,0 +1,29 @@
+
+string[] ports = SerialPort.GetPortNames();
+
+// Add all port names to the combo box:
+foreach (string port in ports)
+ {
+    this.cmb_port.Items.Add(port);
+ }
+cmb_port.SelectedIndex = cmb_port.ItemHeight-1;
+
+//------------------------------------------------------
+
+
+private  void sms_send2(string port_name,string tonumber,string sms_text)
+ {
+
+            SerialPort _serialPort = new SerialPort(port_name, 115200);
+            Thread.Sleep(500);
+            _serialPort.Open();
+            Thread.Sleep(1000);
+            _serialPort.Write("AT+CMGF=1\r");
+            Thread.Sleep(1000);
+            _serialPort.Write("AT+CMGS=\"" + tonumber + "\"\r\n");
+            Thread.Sleep(1000);
+            _serialPort.Write(sms_text + "\x1A");
+            Thread.Sleep(1000);
+            _serialPort.Close();
+           // MessageBox.Show("Send");
+}

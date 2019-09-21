@@ -1,0 +1,5 @@
+--------Title:New Window Open
+	Button2.Attributes.Add("onclick", "window.open('p_pop_up_sales_view.aspx',null,'height=250, width=250,status= no, resizable= no, scrollbars=no, toolbar=no,location=no,menubar=no ');");
+--------Title:
+--------Title:
+--------Title:

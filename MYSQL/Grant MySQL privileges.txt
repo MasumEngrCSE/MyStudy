@@ -1,0 +1,2 @@
+Grant MySQL privileges:
+grant all on dbnam.* to user@host;

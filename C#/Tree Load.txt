@@ -1,0 +1,40 @@
+private void loadSearchDataToTree()
+        {
+            DataTable dtchildc = new ChartOfAccountController().GetTreeData();
+
+            treeView1.Nodes.Clear();
+            Int32 i = -1, v_oldmid = 0, v_oldpid = 0;
+            TreeNode node = new TreeNode();
+
+            foreach (DataRow dr in dtchildc.Rows)
+
+            {
+
+
+                var node2 = new TreeNode
+                {
+                    Name = dr["ID"].ToString(),
+                    Text = dr["NAME"].ToString(),
+                    Tag = dr
+                };
+
+
+
+                if (MethodHelper.GetNullToLong(dr["UPPER_ID"])>0)
+                {
+                    var parentId = dr["UPPER_ID"].ToString();
+                    var parentNode = treeView1.Nodes.Find(parentId, true)[0];
+
+                    parentNode.Nodes.Add(node2);
+                }
+                else
+                {
+                    treeView1.Nodes.Add(node2);
+                }
+
+
+
+            }
+
+
+        }

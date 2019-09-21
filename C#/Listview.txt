@@ -1,0 +1,13 @@
+
+-----------Show Data in listview
+
+ListViewItem lvi = new ListViewItem(rd["bc_id"].ToString());
+lvi.SubItems.Add(rd["bc_name"].ToString());
+lvi.SubItems.Add(rd["bc_name"].ToString());
+lvi.SubItems.Add(rd["bc_name"].ToString());
+lvi.SubItems.Add(rd["bc_name"].ToString());
+lvi.SubItems.Add(rd["bc_name"].ToString());
+this.listView5.Items.Add(lvi);
+
+-----------selected item of list view
+lv.selecteditems[0].subitems[2].text;

@@ -1,0 +1,38 @@
+
+
+        string sql_con = ConfigurationManager.ConnectionStrings["myerpConnectionString"].ConnectionString;
+        string sql = @"select mid,mtitle,pid,ititle from v_tree_code";
+
+        SqlConnection myConnection = new SqlConnection(sql_con);
+        SqlCommand myCommand = new SqlCommand(sql, myConnection);
+        myCommand.CommandType = CommandType.Text;
+        myConnection.Open();
+        using (SqlDataReader myReader = myCommand.ExecuteReader())
+        {
+            if (myReader.HasRows)
+            {
+                TreeView1.Nodes.Clear();
+                Int32 i = -1, v_oldmid = 0, v_oldpid = 0;
+                TreeNode node=new TreeNode();
+                while (myReader.Read())
+                {
+                    if (v_oldmid != Convert.ToInt32(myReader["mid"]))
+                    {
+                        node = new TreeNode(myReader["mtitle"].ToString(), myReader["mid"].ToString());
+                        node.SelectAction = TreeNodeSelectAction.SelectExpand;
+                        TreeView1.Nodes.Add(node);
+                        
+                    }
+
+                    if (myReader["pid"] != DBNull.Value)
+                    {
+                        TreeNode node1 = new TreeNode(myReader["ititle"].ToString(), myReader["pid"].ToString());
+                        node1.SelectAction = TreeNodeSelectAction.SelectExpand;
+                        node.ChildNodes.Add(node1);
+
+                        v_oldmid = Convert.ToInt32(myReader["mid"]);
+                    }
+                }
+            }
+            myReader.Close();
+        }

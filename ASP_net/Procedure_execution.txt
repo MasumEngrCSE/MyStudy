@@ -1,0 +1,19 @@
+        SqlConnection cnn = new SqlConnection(dbConnection.StringRead());
+
+        string sql = @"p_Demonastration_seeds_mst";
+
+        SqlCommand cmd = new SqlCommand(sql, cnn);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.AddWithValue("@op",op);
+        cmd.Parameters.AddWithValue("@pid", pid);
+        cmd.Parameters.AddWithValue("@demo_place", txt_demoplace.Text);
+        cmd.Parameters.AddWithValue("@empid", ddl_officer.SelectedValue);
+        cmd.Parameters.AddWithValue("@ZoneID", ddlZone.SelectedValue);
+        cmd.Parameters.AddWithValue("@Distributor_ID", ddl_distributor.SelectedValue);
+        cmd.Parameters.AddWithValue("@PrdID", ddl_demoproduct.SelectedValue);
+        cmd.Parameters.AddWithValue("@sowing_date", Convert.ToDateTime(txt_sowingdate.Text).ToString("yyyy-MM-dd"));
+
+        cmd.Parameters.AddWithValue("@tr_empid", Session["empid"].ToString());
+        cmd.Parameters.AddWithValue("@tr_date", DateTime.Now);
+        cnn.Open();
+        double v_pidmst= cmd.ExecuteNonQuery();

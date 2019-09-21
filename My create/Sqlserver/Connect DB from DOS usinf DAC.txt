@@ -1,0 +1,5 @@
+
+----------------connect from DOS:
+sqlcmd -S MASUM-PC\SQL2008DB -d master -A;
+ DROP TRIGGER Tr_ServerLogon ON ALL SERVER;  GO;
+--------------------------------

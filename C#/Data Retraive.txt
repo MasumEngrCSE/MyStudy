@@ -1,0 +1,47 @@
+
+
+-------------DataReader :---------------------------------------
+            string cs = @"Data Source=<your server>;Integrated Security=SSPI;Initial Catalog=<your database>";
+
+            string sql = "SELECT cid, ctext FROM SqlDataReaderTable";
+
+            try
+
+            {
+
+                using (SqlConnection con = new SqlConnection(cs))
+
+                {
+
+                    con.Open();
+
+                    SqlCommand cmd = new SqlCommand(sql, con);
+
+                    SqlDataReader rdr = cmd.ExecuteReader();
+
+                    while (rdr.Read())
+
+                    {
+
+                        Console.WriteLine(rdr[0].ToString());
+
+                    }
+
+                    con.Close();
+
+                }
+
+            }
+
+            catch (Exception ex)
+
+            {
+
+                Console.WriteLine(ex);
+
+            }
+
+------------DataAdapter:--------------------------------
+
+
+------------Data Table:

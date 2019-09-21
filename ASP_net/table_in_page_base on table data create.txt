@@ -1,0 +1,103 @@
+ // The method used to generate the grid with table, This method fire when the
+        // JSON find the well serealized data from webService.
+        //
+        function BindTable(Employees) {
+            var root = document.getElementById('mydiv');
+            try {
+                var tblId = document.getElementById('tblGridValue');
+                if (tblId != null) {
+                    root.removeChild(tblId);
+                }
+            }
+            catch (e) {
+
+            }
+            var tab = document.createElement('table');
+            tab.setAttribute("id", "tblGridValue");
+            tab.setAttribute("class", "tableStyle");
+            tab.setAttribute("cellspacing", "3px");
+            var tbo = document.createElement('tbody');
+            var row, cell;
+            // the list object now extract the value for each row
+            $.each(Employees, function(index, employee) {
+                row = document.createElement('tr');
+                row.setAttribute("class", "tableRaw");
+
+                //
+                // the object of LIST is now extract the each cell of row
+                //
+                for (var j = 0; j < 5; j++) {
+                    cell = document.createElement('td');
+                    cell.setAttribute("width", "200px");
+                    var empId = employee.id;
+                    var empName = employee.Name;
+                    var empEmail = employee.Email;
+                    var empPhone = employee.Phone;
+                    var empAddress = employee.Address;
+                    if (j == 0) {
+
+                        //Create an input type dynamically.
+                        var hiddenId = document.createElement("input");
+                        //Assign different attributes to the element.
+                        hiddenId.setAttribute("type", "hidden");
+                        hiddenId.setAttribute("id", "hfRow_" + employee.Id);
+                        hiddenId.setAttribute("value", employee.Id);
+                        cell.appendChild(hiddenId);
+                        cell.appendChild(document.createTextNode(employee.Name));
+                    }
+                    else if (j == 1) {
+                        var spanValue = document.createElement("span");
+                        cell.setAttribute("width", "200px");
+                        spanValue.setAttribute("display", "inline-block");
+                        spanValue.appendChild(document.createTextNode(employee.Email));
+                        cell.appendChild(spanValue);
+                    }
+                    else if (j == 2) {
+                        cell.setAttribute("width", "200px");
+                        cell.appendChild(document.createTextNode(employee.Phone));
+                    }
+                    else if (j == 3) {
+                        cell.setAttribute("width", "200px");
+                        cell.appendChild(document.createTextNode(employee.Address));
+                    }
+                    else if (j == 4) {
+                        //
+                        // in this state loop generates Edit and Delete button for each row
+                        //
+                        var element = document.createElement("img");
+                        element.setAttribute("src", "images/edit-icon.gif");
+                        element.setAttribute("width", "15px");
+                        cell.setAttribute("width", "100px");
+
+                        //
+                        // This loop also adding a click event EditMode()
+                        //
+                        element.setAttribute("onclick", "EditMode('"
+                                                            + empId + "','"
+                                                            + empName + "','"
+                                                            + empEmail + "','"
+                                                            + empPhone + "','"
+                                                            + empAddress + "')");
+
+                        cell.appendChild(element);
+
+                        //
+                        // Same way the row created Delete button
+                        //
+                        var elementDelete = document.createElement("img");
+                        elementDelete.setAttribute("src", "images/DeleteRed.png");
+                        elementDelete.setAttribute("width", "15px");
+
+                        //
+                        // Also created the Delete Method in onclick event
+                        //
+                        elementDelete.setAttribute("onclick", "return DeleteMode('" + empId + "')");
+                        cell.appendChild(elementDelete);
+                    }
+                    row.appendChild(cell);
+                }
+                tbo.appendChild(row);
+            });
+            tab.appendChild(tbo);
+            root.appendChild(tab);
+        }

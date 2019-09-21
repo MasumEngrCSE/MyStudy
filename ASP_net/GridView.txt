@@ -1,0 +1,67 @@
+--------------Row Edit Mode show
+        GridView1.EditIndex = e.NewEditIndex;
+        show_grid data();
+----------------Data Load:
+	DataTable tblgrid = new DataTable();
+        string sql;
+        DBConnection dbcon = new DBConnection();
+        SqlConnection cnn = new SqlConnection(dbcon.connectionString); ;
+
+        SqlCommand dbcommand = new SqlCommand();
+        dbcommand.Connection = cnn;
+        sql = "SELECT CID,Name,Address  FROM Customer where ZoneID='" + _zoneid + "'";
+        dbcommand.CommandText = sql;
+        cnn.Open();
+        SqlDataAdapter objadapter = new SqlDataAdapter();
+        objadapter.SelectCommand = dbcommand;
+        objadapter.Fill(tblgrid);
+        GridView1.DataSource = tblgrid;
+        GridView1.DataBind();
+-----------------Paging:Enable on data table load
+	protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    	{
+        	GridView1.PageIndex = e.NewPageIndex;
+       		GridView1.DataBind();
+       		v_gridload(dd_year.SelectedValue, dd_zone.SelectedValue);
+    	}
+-------------------------------GridView1_RowCommand
+    protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
+    {
+        //GridViewRow row = GridView1.Rows[e.RowIndex];
+        string vvv = "";
+
+        //--------------
+            int index = int.Parse(e.CommandArgument.ToString());
+            //int RowIndex = Convert.ToInt32(e.CommandArgument);
+        
+            //int index = int.Parse(e.CommandSource.ToString());
+            GridViewRow row = GridView1.Rows[index];
+
+            gbl_load_grid.gbl_year = cmbyear.SelectedItem.Text.Substring(1, 4);
+            gbl_load_grid.gbl_yearid = cmbyear.SelectedValue;
+            gbl_load_grid.gbl_zoneid = dd_zone.SelectedValue;
+            gbl_load_grid.gbl_cid = cmbcustomer.SelectedValue;
+            gbl_load_grid.gbl_tid = row.Cells[1].Text;
+            gbl_load_grid.gbl_catid = row.Cells[3].Text;
+            gbl_load_grid.gbl_prdid = row.Cells[5].Text;
+            string oooname = e.CommandName.ToString();
+
+            string url = "p_pop_up_sales_view.aspx";
+            string fullURL = "window.open('" + url + "', '_blank','height=250,width=500,status=yes,toolbar=no,menubar=no,location=no,scrollbars=yes,resizable=no,titlebar=no' );";
+
+            int myRow = int.Parse(e.CommandArgument.ToString());
+            Button Button1 =(Button)GridView1.Rows[myRow].Cells[9].Controls[0];
+
+            Button1.Attributes.Add("OnClick", fullURL);
+
+
+            // Button Button1 = (Button)e.Row.FindControl("Button1");
+            //Button1.Attributes.Add("onclick", "ShowMyModalPopup('" + GridView1.DataKeys[e.Row.RowIndex].Value + "')");
+
+        //-----------
+
+
+        vvv = vvv;
+    }
+-------------------------------
+-------------------------------

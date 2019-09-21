@@ -1,0 +1,14 @@
+static void Main(string[] args)
+        {
+            int a, b;
+            MyCass mc = new MyCass();
+            Console.Write("Enter First Line");
+            a = Convert.ToInt32(Console.ReadLine());
+            b = Convert.ToInt32(Console.ReadLine());
+
+
+            Console.WriteLine(mc.Add(a,b));
+            Console.WriteLine(mc.Dev(a,b));
+            Console.WriteLine(mc.Mul(a,b));
+            Console.WriteLine(mc.Sub(a,b));
+            Console.ReadLine();

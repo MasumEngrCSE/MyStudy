@@ -1,0 +1,3 @@
+ string fff = AppDomain.CurrentDomain.BaseDirectory;
+ fff = fff.Substring(0, (fff.Length - 10));
+ MessageBox.Show(fff);

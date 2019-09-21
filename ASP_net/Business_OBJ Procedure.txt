@@ -1,0 +1,52 @@
+--------------- Create Procedure Emp Add -----------------
+Create Procedure Proc_Emp_Add
+@Emp_Id int,
+@EName varChar(50),
+@Address varChar(100),
+@Phone varchar(50),
+@Email varchar(50)
+
+--With Encryption
+AS
+  BEGIN
+    INSERT into Emp_Tbl(Emp_Id,EName,Address,Phone,Email)
+    Values
+    (	@Emp_Id,
+	@EName,
+	@Address,
+	@Phone,
+	@Email
+    )
+END
+GO
+
+
+Create Procedure Proc_Emp_Del
+@Emp_Id int
+
+--With Encryption
+AS
+  BEGIN
+    delete from Emp_Tbl
+	where Emp_Id = @Emp_Id
+END
+GO
+
+------------------Update-------------
+Create Procedure Emp_Update
+@Emp_Id int,
+@EName varChar(50),
+@Address varChar(100),
+@Phone varchar(50),
+@Email varchar(50)
+AS
+  BEGIN
+    update TestEmp
+set EmpName = @EName
+,Address = @Address
+,Phone = @Phone
+,Email = @Email
+WHERE Empid=@Emp_Id
+END
+GO
+

@@ -1,0 +1,42 @@
+class Program
+    {
+        static void Main(string[] args)
+        {
+            int nos;
+            float nop;
+            short nod;
+
+            Console.Write("Enter the Number of Shirt: ");
+            nos = Convert.ToInt32(Console.ReadLine());
+
+            Console.Write("Enter the Number of Pant: " );
+            nop = float.Parse(Console.ReadLine());
+
+            Console.Write("Enter the Number of Dress: " );
+            nod = short.Parse(Console.ReadLine());
+            
+            Console.WriteLine("\n=====Its a program=======");
+            Console.WriteLine("\nNumber of Pant");
+            Console.WriteLine("===============");
+            Console.WriteLine(nop);
+
+            Console.WriteLine("\nNumber of Shirt");
+            Console.WriteLine("===============");
+            Console.WriteLine(nos);
+
+            Console.WriteLine("\nNumber of Dress");
+            Console.WriteLine("================");
+            Console.WriteLine(nod);
+
+            Console.WriteLine("\n=====Ja Vag=======");
+            
+            //Console.WriteLine("Number of Shirt ==" + nos);
+            //Console.WriteLine("Number of Pant ==" + nop);
+            //Console.WriteLine("Number of Dress == "+ nod);
+            Console.ReadLine();
+
+
+
+        }
+    }
+}

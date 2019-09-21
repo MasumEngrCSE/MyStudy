@@ -1,0 +1,37 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace ConsoleApplication3
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {   Car c = new Car();
+            KTI k = new KTI();
+            MTI m = new MTI();
+                    
+            c.Name = "BMW";
+            c.ModelNo = "X5";
+            c.Nod = 4;
+            c.Color = "Black";
+            Console.WriteLine("\n\t\tMy Car's Specification");
+            Console.WriteLine("\t   _______________________________\n");
+            Console.WriteLine("\n\t\tThe Car is " + c.Name);
+            Console.WriteLine("\n\t\tModel No is " + c.ModelNo);
+            Console.WriteLine("\n\t\tNumber of Door is " + c.Nod);
+            Console.WriteLine("\n\t\tColor is " + c.Color);
+            Console.WriteLine("\n\t\tWhat U think about the car??\n\n");
+
+            k.Age = 19;
+            m.Area = "Bandorbon";
+            
+            Console.WriteLine("\t_________KTI & MTI CLASS______________");
+            Console.WriteLine("\n\n\n\t\t Age of KTI is " + k.Age);
+            Console.WriteLine("\n\t\tArea of KTI is " + m.Area);
+            
+            Console.ReadLine();
+
+        }
+    }
+}

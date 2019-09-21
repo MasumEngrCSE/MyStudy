@@ -1,0 +1,60 @@
+using System;
+using System.Data;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+
+public partial class _Default : System.Web.UI.Page 
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+    }
+    protected void Button1_Click(object sender, EventArgs e)
+    {
+        HttpCookie mycook = new HttpCookie("My Info");
+        mycook["Name"] = TextBox1.Text;
+        mycook["Add"] = TextBox2.Text;
+        mycook["Phone"] = TextBox3.Text;
+        mycook.Expires = DateTime.Now.AddDays(1);
+        Response.Cookies.Add(mycook);
+    }
+    protected void Button2_Click(object sender, EventArgs e)
+    {
+        
+    }
+}
+
+Page 2
+
+using System;
+using System.Data;
+using System.Configuration;
+using System.Collections;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+
+public partial class Default2 : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+    }
+    protected void Button1_Click(object sender, EventArgs e)
+    {
+        HttpCookie a = Request.Cookies["my info"];
+       TextBox1.Text = a["Name"];
+       TextBox2.Text = a["Add"]; 
+       TextBox3.Text = a["Phone"];
+    }
+}
+
+

@@ -1,0 +1,57 @@
+using System;
+using System.Data;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.Data.SqlClient;
+
+public partial class _Default : System.Web.UI.Page 
+{
+    SqlConnection cn = new SqlConnection(ConfigurationManager.ConnectionStrings["MyCon"].ConnectionString);
+        
+        
+    protected void Page_Load(object sender, EventArgs e)
+    {
+      display();  
+    }
+    public void display()
+    {
+        SqlDataAdapter DA = new SqlDataAdapter("Select * from EmpTest", cn);
+        DataSet DS = new DataSet();
+        DA.Fill(DS, "EmpTest");
+        GridView1.DataSource=DS;
+        GridView1.DataBind();
+    }
+    protected void Button1_Click(object sender, EventArgs e)
+    {
+        String sql;
+        sql = "Insert into EmpTest values('"+TxtName.Text+"','"+TxtAdd.Text+"','"+TxtPhone.Text+"','"+TxtEmail.Text+"')";
+        SqlCommand  cmd = new SqlCommand(sql,cn);
+        cn.Open();
+        cmd.ExecuteNonQuery();
+        display();
+    }
+    protected void Button4_Click(object sender, EventArgs e)
+    {
+        SqlCommand cmd = new SqlCommand("Select * from EmpTest where EmpNo = "+Convert.ToInt32(TxtId.Text)+"", cn);
+        cn.Open();
+        SqlDataReader dr = cmd.ExecuteReader();
+        dr.Read();
+        TxtName.Text = dr.GetString(1);
+        TxtAdd.Text = dr.GetString(2);
+
+        TxtPhone.Text = Convert.ToString( dr.GetValue(3));
+        TxtEmail.Text = dr.GetString(4);
+
+    }
+    protected void Button3_Click(object sender, EventArgs e)
+    {
+        SqlCommand cmd = new SqlCommand("Delete from EmpTest where EmpNo = " + Convert.ToUInt32(TxtId.Text) + "", cn);
+        cn.Open();
+        cmd.ExecuteNonQuery();
+    }
+}

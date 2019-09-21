@@ -1,0 +1,27 @@
+---------Start
+
+   <script type = "text/javascript">
+       
+        function MyFunc()
+        {
+            if(document.getElementById("Image1").style.visibility == "" || document.getElementById("Image1").style.visibility == "visible")
+            {
+                document.getElementById("Image1").style.visibility = "hidden";
+                document.getElementById("Image2").style.visibility = "visible";
+            }
+            else if(document.getElementById("Image2").style.visibility == "visible")
+            {   
+                document.getElementById("Image2").style.visibility = "hidden";
+                document.getElementById("Image1").style.visibility = "visible";
+            }
+        }
+         
+    </script>
+
+
+------------------------
+<asp:Image ID="Image2" runat="server" onmouseover = "MyFunc();" ImageUrl="~/index.jpg" />
+-----------------------------
+
+
+------------End
