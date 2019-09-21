@@ -1,0 +1,69 @@
+DECLARE CLoan CURSOR FOR
+	SELECT isnull(PRESENTPERMONTHINTEREST,0),SENCTIONID,isnull(INSTALLMENTAMT,0) 
+	FROM LoanSenction 
+  	WHERE EMPID=@Var_EMPID 
+  		and DEDUCTABLE='Y' 
+  		And GRACEPERIODSTATUS='Y' 
+  		And LOANSTATUS='A' 
+  		And AUTHENTICATEDATE is not null;
+
+	OPEN CLoan;
+		FETCH next from CLoan 
+		INTO @Var_LoanInterestAmt,@Var_SenctionId,@Var_LoanInstallAmt;
+	
+			select @var_temp=count(*)
+			from Loan_off_tbl
+			where empid=@Var_EMPID and loan_id=@Var_SenctionId and lmonth=@P_TMONTH
+				and lyear=@P_TYEAR;
+			if @var_temp=0 
+				begin
+					set @Tot_loan_amt=0
+					WHILE @@FETCH_STATUS = 0
+					begin
+						delete from Loan_Month_Detuct 
+							where s_id=@Var_SenctionId 
+								and lmonth=@P_TMONTH and lyear=@P_TYEAR;
+
+						set @Tot_loan_amt=@Tot_loan_amt+(@Var_LoanInterestAmt+@Var_LoanInstallAmt);
+						
+
+						---------------------------
+						declare @v_temp_loan_deduct varchar(1)
+				
+								--check loan DEDUCTABLEs :when 'Y' then go deduct else update loansenction DEDUCTABLE='N'
+						select @v_temp_loan_deduct=case when ( select LOANAMT from  LOANSENCTION where senctionid=@Var_SenctionId)=(
+								select openingbalance+isnull((select sum(amount) from Loan_Month_Detuct where s_id=LOANSENCTION.senctionid),0) deduct_install 
+								From LOANSENCTION where senctionid=@Var_SenctionId) then
+								'N'
+							else
+								'Y'
+							end
+						if @v_temp_loan_deduct='N'
+							begin
+								update LOANSENCTION
+								set DEDUCTABLE='N' 
+								where senctionid=@Var_SenctionId;
+							end
+						else if @v_temp_loan_deduct='Y'
+							begin
+								--if @Var_LoanInterestAmt<>0
+								begin
+									INSERT INTO Loan_Month_Detuct(empid,S_ID,Amount,Interest,lmonth,lyear)
+									VALUES(
+									@Var_EMPID,	--<empid,varchar(10),>,
+									@Var_SenctionId,	--<S_ID,varchar(7),>,
+									@Var_LoanInstallAmt,	--<Amount,float,>,
+									@Var_LoanInterestAmt,	--<Interest,float,>,
+									@P_TMONTH,		--<lmonth,int,>,
+									@P_TYEAR		--<lyear,int,>
+									)
+								end
+							end
+			
+					FETCH next from CLoan 
+					INTO @Var_LoanInterestAmt,@Var_SenctionId,@Var_LoanInstallAmt;
+				end
+			end
+
+CLOSE CLoan
+DEALLOCATE CLoan

@@ -1,0 +1,18 @@
+
+begin
+declare @ist bigint
+declare @est bigint
+set @ist=1
+set @est=90000
+delete from test
+while(@est>=@ist)
+begin
+	insert into test(id,addr,addr2) 
+	values(@ist,
+	'Ninety One Thousand One Hundred Eighty Nine Crore Sixty Five Lac Thirty Five Thousand Eight Hundred Eighty Seven Taka And Nine Thousand Eight Hundred Poisa',
+	'Ninety One Thousand One Hundred Eighty Nine Crore Sixty Five Lac Thirty Five Thousand Eight Hundred Eighty Seven Taka And Nine Thousand Eight Hundred Poisa'
+	)
+	set @ist=@ist+1
+end
+
+end

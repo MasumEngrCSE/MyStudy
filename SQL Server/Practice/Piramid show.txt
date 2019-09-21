@@ -1,0 +1,29 @@
+
+create procedure p_piramid(@l int) 
+as
+begin
+declare @i int,@n int,@ps int
+declare @v varchar(150)
+set @i=1
+set @l=19
+set @ps=ceiling(@l/2)
+set @v=''
+	while(@i<=@l)
+	begin
+	--print @i
+
+		set @n=0
+		set @v=''
+		set @v=SPACE(@ps)
+		while(@n<@i)
+		begin
+			
+			set @v=@v+'*'
+			set @n=@n+1
+		end
+	print @v
+	set @i=@i+2
+	set @ps=@ps-1
+	end
+
+end

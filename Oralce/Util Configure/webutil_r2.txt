@@ -1,0 +1,22 @@
+1. paste webutil folder in the forms folder
+2. copy jacob.jar in the java folder  (Ex. D:\Util Configure\java to D:\DevSuiteHome_1\forms\java)
+3. Add rt.jar location path in the end of CLASSPATH forms/server/default.env which is rt.jar.
+	
+	CLASSPATH=D:\DevSuiteHome_1\j2ee\OC4J_BI_Forms\applications\formsapp\formsweb\WEB-INF\lib\frmsrv.jar;D:\DevSuiteHome_1\jlib\repository.jar;D:\DevSuiteHome_1\jlib\ldapjclnt10.jar;D:\DevSuiteHome_1\jlib\debugger.jar;D:\DevSuiteHome_1\jlib\ewt3.jar;D:\DevSuiteHome_1\jlib\share.jar;D:\DevSuiteHome_1\jlib\utj.jar;D:\DevSuiteHome_1\jlib\zrclient.jar;D:\DevSuiteHome_1\reports\jlib\rwrun.jar;D:\DevSuiteHome_1\forms\java\frmwebutil.jar;D:\DevSuiteHome_1\jdk\jre\lib\rt.jar
+(You can search the 'rt.jar' in devsuitehome_1 to get the full path)
+
+4. webutil.cfg file configuaration 
+		transfer.database.enabled=TRUE
+		transfer.appsrv.enabled=TRUE
+		transfer.appsrv.workAreaRoot=c:\temp
+		transfer.appsrv.write.1=c:\temp
+		transfer.appsrv.read.1=c:\temp
+5. copy webutil.pll (and webutil.plx) in the forms
+	
+6. copy the txt written in key.txt and paste to forms/server/formsweb.cfg at end.
+
+----------------------
+7. After configure just run by : http://server:8889/forms/frmservlet?config=two  -------------[name of key]
+
+
+Rpt Server : rwserver server=rpt1 -install

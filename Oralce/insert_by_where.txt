@@ -1,0 +1,5 @@
+insert into (select UNIT_DEPT_NO,UNIT_NAME
+            from unit_dept_tbl
+            where UNIT_DEPT_NO='9'
+            )
+        values('10','test2');

@@ -1,0 +1,19 @@
+Public Function DateFromatYMD(FullText As String) As String
+    Dim d As String, m As String, y As Integer, sql As String
+    d = Mid(FullText, 1, 2)
+    m = Mid(FullText, 4, 2)
+    y = Val(Mid(FullText, 7, 10))
+    
+   
+    sql = sql + Trim(Str(y))
+    
+    'If Len(Trim(Str(m))) = 1 Then DateFromatYMD = DateFromatYMD + "0"
+    
+    sql = sql + "/" + Trim(CStr(m)) + "/"
+    
+    'If Len(Trim(Str(d))) = 1 Then DateFromatYMD = "0"
+
+    sql = sql  + Trim(CStr(d))
+    DateFromatYMD = sql
+
+End Function

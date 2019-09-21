@@ -1,0 +1,497 @@
+
+
+-------------------------Procedure:sp_ins_master
+CREATE procedure [dbo].[sp_ins_master]
+@procname varchar(100),
+@tablename varchar(100)
+
+as 
+declare @0sql varchar(7500),
+		@sql varchar(7500), 
+		@sql1 varchar(4000),
+		@sql2 varchar(4000), 
+		@sql3 varchar(4000),
+		@sql4 varchar(4000),
+		@searchfield varchar(500),
+		@return_identity_Id varchar(100)
+
+declare @fieldname varchar(50),
+		@fieldtype varchar(50),
+		@length int,
+		@is_identity bit, 
+		@is_primary_key bit
+
+set @sql='Create procedure ins_' + @procname 
+
+		DECLARE FieldList CURSOR FOR
+		--Read the instruction carefully
+		--opening summarize attendance captured form machine
+			--select codeno,isnull(max(slno),0) slno from tbl_personal_education where codeno=@codeno and slno=@slno
+			--group by codeno
+				select b.name tablename,a.name fieldname,c.name fieldtype,
+				case when c.name in('image',
+				'text'
+				,'uniqueidentifier'
+				,'date'
+				,'time'
+				,'datetime2'
+				,'datetimeoffset'
+				,'tinyint'
+				,'smallint'
+				,'int'
+				,'smalldatetime'
+				,'real'
+				,'money'
+				,'datetime'
+				,'float'
+				,'sql_variant'
+				,'ntext'
+				,'bit'
+				,'decimal'
+				,'smallmoney'
+				,'bigint'
+				,'varbinary'
+				,'binary'
+				,'timestamp'
+				,'sysname'
+				,'hierarchyid'
+				,'geometry'
+				,'geography'
+				,'xml')then null else max_length end length, is_identity, 
+				isnull((select top 1 is_primary_key from sys.indexes inner join sys.index_columns on 
+				sys.indexes.object_id=sys.index_columns.object_id and sys.indexes.index_id=sys.index_columns.index_id where sys.indexes.object_id=a.object_id and column_id=a.column_id),0)
+				from sys.columns as a
+				inner join sys.tables as b on a.object_id=b.object_id --where
+				inner join SYS.systypes as c on a.system_type_id=c.xtype and c.status=0
+				--left join (select top 1 * from sys.index_columns where object_id=a.object_id and a.column_id=column_id) as d on d.object_id=a.object_id and a.column_id=d.column_id
+				--left join sys.indexes as e on e.object_id=d.object_id and d.index_id=e.index_id
+				where b.name=@tablename
+				order by b.name,a.column_id
+		--select codeno,slno from tbl_personal_education where codeno=@codeno and slno=@slno
+
+		OPEN FieldList
+		FETCH NEXT FROM FieldList
+		into @tablename, @fieldname, @fieldtype, @length, @is_identity,@is_primary_key
+
+		WHILE @@FETCH_STATUS = 0
+			BEGIN
+				if @sql1 is null 
+					begin
+--print 'find'
+				select  @sql1= '@' + @fieldname + ' ' + cast(@fieldtype as varchar) + case when cast(@length as varchar) is null then '' else ' (' +  isnull(cast(@length as varchar),'') + ')'end
+				--print @sql1
+					end
+				else	
+				begin
+					select @sql1=  @sql1 + '
+	,@' + @fieldname + ' ' + cast(@fieldtype as varchar) + case when cast(@length as varchar) is null then '' else ' (' +  isnull(cast(@length as varchar),'') + ')'end
+				--print @sql1
+					
+				end
+				if (@is_primary_key=1) 
+					begin
+						select @searchfield=@fieldname;
+					end
+					
+				if (@is_primary_key=1 and @is_identity=1)
+					begin
+						select @return_identity_Id='select SCOPE_IDENTITY()';
+					end
+		FETCH NEXT FROM FieldList
+		into @tablename, @fieldname, @fieldtype, @length, @is_identity,@is_primary_key
+			end
+		close FieldList
+		deallocate FieldList
+set 	@sql=@sql+'
+	'+@sql1 + '
+
+as
+    DECLARE @ErrorCode     int,
+		@update_by varchar(50), 
+		@update_date datetime
+		
+    SET @ErrorCode = 0
+    SET @update_by=SYSTEM_USER;
+    SET @update_date=GETDATE();
+
+	if (not exists(select '+isnull(@searchfield,'')+' from '+@tablename+' where '+isnull(@searchfield,'')+'=@'+isnull(@searchfield,'')+') or @'+isnull(@searchfield,'')+' is null)
+		begin
+		
+			insert into '+@tablename + '( '
+
+		DECLARE FieldList CURSOR FOR
+		--Read the instruction carefully
+		--opening summarize attendance captured form machine
+			--select codeno,isnull(max(slno),0) slno from tbl_personal_education where codeno=@codeno and slno=@slno
+			--group by codeno
+				select b.name tablename,a.name fieldname,c.name fieldtype,max_length length, is_identity,
+				isnull((select top 1 is_primary_key from sys.indexes inner join sys.index_columns on 
+				sys.indexes.object_id=sys.index_columns.object_id and sys.indexes.index_id=sys.index_columns.index_id where sys.indexes.object_id=a.object_id and column_id=a.column_id),0)
+				from sys.columns as a
+				inner join sys.tables as b on a.object_id=b.object_id --where
+				inner join SYS.systypes as c on a.system_type_id=c.xtype and c.status=0
+				--left join (select top 1 * from sys.index_columns) as d on d.object_id=a.object_id and a.column_id=d.column_id
+				--left join sys.indexes as e on e.object_id=d.object_id and d.index_id=e.index_id
+				where b.name=@tablename and is_identity=0
+				order by b.name,a.column_id
+
+		--select codeno,slno from tbl_personal_education where codeno=@codeno and slno=@slno
+		OPEN FieldList
+		FETCH NEXT FROM FieldList
+		into @tablename, @fieldname, @fieldtype, @length, @is_identity,@is_primary_key
+
+		WHILE @@FETCH_STATUS = 0
+			BEGIN
+				if @sql2 is null 
+					begin
+--print 'find'
+			select  @sql2= '
+			' + @fieldname 
+			select @sql3= '
+			@' + @fieldname 
+			--print @sql1
+				end
+			else	
+			begin
+			select @sql2=  @sql2 + '
+			,' + @fieldname 
+			select @sql3=  @sql3 + '
+			,@' + @fieldname 
+
+				--print @sql1
+					
+				end
+		FETCH NEXT FROM FieldList
+		into @tablename, @fieldname, @fieldtype, @length, @is_identity,@is_primary_key
+			end
+		close FieldList
+		deallocate FieldList
+		set 	@sql=@sql + @sql2 + ') 
+			values 
+			(' + @sql3 +'
+			)
+			'+ isnull(@return_identity_Id,'') +'
+			IF( @@ERROR <> 0 )
+			BEGIN
+				SET @ErrorCode = -1
+				GOTO Cleanup
+			END
+		end
+	else
+		begin'
+		set 	@0sql=  '
+			RAISERROR (''Record already exist. Unable to an new record.'',
+			16, 1)
+		end
+    RETURN 0
+	Cleanup:
+		RETURN @ErrorCode
+'
+print @sql 
+print @0sql
+
+
+-------------------------Procedure:sp_upd_master
+
+CREATE procedure [dbo].[sp_upd_master]
+@procname varchar(100),
+@tablename varchar(100)
+as 
+declare  @0sql varchar(7500),
+		@sql varchar(7500), @sql1 varchar(4000),@sql2 varchar(4000), @sql3 varchar(4000),
+		@sql4 varchar(4000),@searchfield varchar(500)
+
+declare @fieldname varchar(50),
+		@fieldtype varchar(50),
+		@length int,
+		@is_identity bit, @is_primary_key bit
+
+set @sql='Create procedure upd_' + @procname 
+
+		DECLARE FieldList CURSOR FOR
+		--Read the instruction carefully
+		--opening summarize attendance captured form machine
+			--select codeno,isnull(max(slno),0) slno from tbl_personal_education where codeno=@codeno and slno=@slno
+			--group by codeno
+				select b.name tablename,a.name fieldname,c.name fieldtype,
+				case when c.name in('image',
+				'text'
+				,'uniqueidentifier'
+				,'date'
+				,'time'
+				,'datetime2'
+				,'datetimeoffset'
+				,'tinyint'
+				,'smallint'
+				,'int'
+				,'smalldatetime'
+				,'real'
+				,'money'
+				,'datetime'
+				,'float'
+				,'sql_variant'
+				,'ntext'
+				,'bit'
+				,'decimal'
+				,'smallmoney'
+				,'bigint'
+				,'varbinary'
+				,'binary'
+				,'timestamp'
+				,'sysname'
+				,'hierarchyid'
+				,'geometry'
+				,'geography'
+				,'xml')then null else max_length end length, is_identity, 
+				isnull((select top 1 is_primary_key from sys.indexes inner join sys.index_columns on 
+				sys.indexes.object_id=sys.index_columns.object_id and sys.indexes.index_id=sys.index_columns.index_id where sys.indexes.object_id=a.object_id and column_id=a.column_id),0)
+				from sys.columns as a
+				inner join sys.tables as b on a.object_id=b.object_id --where
+				inner join SYS.systypes as c on a.system_type_id=c.xtype and c.status=0
+				--left join (select top 1 * from sys.index_columns) as d on d.object_id=a.object_id and a.column_id=d.column_id
+				--left join sys.indexes as e on e.object_id=d.object_id and d.index_id=e.index_id
+				where b.name=@tablename
+				order by b.name,a.column_id
+		--SELECT * FROM sys.columns where name='BookTitle'
+		--SELECT * FROM sys.tables
+		--SELECT * FROM SYS.systypes where xtype=231
+		--select codeno,slno from tbl_personal_education where codeno=@codeno and slno=@slno
+		OPEN FieldList
+		FETCH NEXT FROM FieldList
+		into @tablename, @fieldname, @fieldtype, @length, @is_identity,@is_primary_key
+
+		WHILE @@FETCH_STATUS = 0
+			BEGIN
+				if @sql1 is null 
+					begin
+--print 'find'
+				select  @sql1= '@' + @fieldname + ' ' + cast(@fieldtype as varchar) + case when cast(@length as varchar) is null then '' else ' (' +  isnull(cast(@length as varchar),'') + ')'end
+				--print @sql1
+					end
+				else	
+				begin
+					select @sql1=  @sql1 + '
+	,@' + @fieldname + ' ' + cast(@fieldtype as varchar) + case when cast(@length as varchar) is null then '' else ' (' +  isnull(cast(@length as varchar),'') + ')'end
+				--print @sql1
+					
+				end
+				if @is_primary_key=1 
+					begin
+						select @searchfield=@fieldname;
+					end
+		FETCH NEXT FROM FieldList
+		into @tablename, @fieldname, @fieldtype, @length, @is_identity,@is_primary_key
+			end
+		close FieldList
+		deallocate FieldList
+set 	@sql=@sql + '
+	'+@sql1 + '
+
+as
+    DECLARE @ErrorCode     int,
+		@update_by varchar(50), 
+		@update_date datetime
+		
+    SET @ErrorCode = 0
+    SET @update_by=SYSTEM_USER;
+    SET @update_date=GETDATE();
+
+	if (not exists(select '+@searchfield+' from '+@tablename+' where '+@searchfield+'=@'+@searchfield+') or @'+@searchfield+' is null)
+		begin
+		
+		   RAISERROR (''Record does not exist. Unable to modify record.'',
+			  16, 1)
+		end
+	
+	else
+
+		begin
+			UPDATE '+@tablename+'
+			SET '
+
+		DECLARE FieldList CURSOR FOR
+		--Read the instruction carefully
+		--opening summarize attendance captured form machine
+			--select codeno,isnull(max(slno),0) slno from tbl_personal_education where codeno=@codeno and slno=@slno
+			--group by codeno
+				select b.name tablename,a.name fieldname,c.name fieldtype,max_length length, is_identity, 
+				is_primary_key=isnull((select top 1 is_primary_key from sys.indexes inner join sys.index_columns on 
+				sys.indexes.object_id=sys.index_columns.object_id and sys.indexes.index_id=sys.index_columns.index_id where sys.indexes.object_id=a.object_id and column_id=a.column_id),0)
+				from sys.columns as a
+				inner join sys.tables as b on a.object_id=b.object_id --where
+				inner join SYS.systypes as c on a.system_type_id=c.xtype and c.status=0
+				--left join (select top 1 * from sys.index_columns) as d on d.object_id=a.object_id and a.column_id=d.column_id
+				--left join sys.indexes as e on e.object_id=d.object_id and d.index_id=e.index_id
+				where b.name=@tablename and 
+				(
+				isnull((select top 1 is_primary_key from sys.indexes inner join sys.index_columns on 
+				sys.indexes.object_id=sys.index_columns.object_id and sys.indexes.index_id=sys.index_columns.index_id where sys.indexes.object_id=a.object_id and column_id=a.column_id),0)=0
+				)
+				order by b.name,a.column_id
+
+		--select codeno,slno from tbl_personal_education where codeno=@codeno and slno=@slno
+		OPEN FieldList
+		FETCH NEXT FROM FieldList
+		into @tablename, @fieldname, @fieldtype, @length, @is_identity,@is_primary_key
+
+		WHILE @@FETCH_STATUS = 0
+		BEGIN
+			if @sql4 is null 
+				begin
+--print 'find'
+			select  @sql4= '			'+@fieldname + ' = @' + @fieldname 
+			--print @sql1
+				end
+			else	
+			begin
+			select @sql4=  @sql4 + '
+			,' + @fieldname + ' = @' + @fieldname 
+
+			--print @sql1
+				
+			end
+		FETCH NEXT FROM FieldList
+		into @tablename, @fieldname, @fieldtype, @length, @is_identity,@is_primary_key
+		end
+		close FieldList
+		deallocate FieldList
+
+set 	@0sql= @sql4 + '
+			where '+@searchfield+' = @'+@searchfield+'
+			
+			IF( @@ERROR <> 0 )
+			BEGIN
+				SET @ErrorCode = -1
+				GOTO Cleanup
+			END
+		end
+
+    RETURN 0
+	Cleanup:
+		RETURN @ErrorCode
+'
+
+print @sql 
+print @0sql
+
+-------------------------Procedure:
+
+CREATE procedure [dbo].[sp_del_master]
+@procname varchar(100),
+@tablename varchar(100)
+as 
+declare  @0sql varchar(7500),
+@sql varchar(7500), @sql1 varchar(4000),@sql2 varchar(4000), @sql3 varchar(4000),
+@sql4 varchar(4000)
+declare @fieldname varchar(50),
+		@fieldtype varchar(50),
+		@length int,
+		@is_identity bit, 
+		@is_primary_key bit
+
+
+set @sql='Create procedure del_' + @procname 
+
+		DECLARE FieldList CURSOR FOR
+		--Read the instruction carefully
+		--opening summarize attendance captured form machine
+			--select codeno,isnull(max(slno),0) slno from tbl_personal_education where codeno=@codeno and slno=@slno
+			--group by codeno
+				select top 1 b.name tablename,a.name fieldname,c.name fieldtype,
+				case when c.name in('image',
+				'text'
+				,'uniqueidentifier'
+				,'date'
+				,'time'
+				,'datetime2'
+				,'datetimeoffset'
+				,'tinyint'
+				,'smallint'
+				,'int'
+				,'smalldatetime'
+				,'real'
+				,'money'
+				,'datetime'
+				,'float'
+				,'sql_variant'
+				,'ntext'
+				,'bit'
+				,'decimal'
+				,'smallmoney'
+				,'bigint'
+				,'varbinary'
+				,'binary'
+				,'timestamp'
+				,'sysname'
+				,'hierarchyid'
+				,'geometry'
+				,'geography'
+				,'xml')then null else max_length end length, is_identity, is_primary_key
+				from sys.columns as a
+				inner join sys.tables as b on a.object_id=b.object_id --where
+				inner join SYS.systypes as c on a.system_type_id=c.xtype and c.status=0
+				left join sys.index_columns as d on d.object_id=a.object_id and a.column_id=d.column_id
+				left join sys.indexes as e on e.object_id=d.object_id and d.index_id=e.index_id
+				where b.name=@tablename and (is_primary_key=1 or is_primary_key=0)
+				order by b.name,a.column_id
+				--SELECT * FROM sys.columns where name='BookTitle'
+				--SELECT * FROM sys.tables
+				--SELECT * FROM SYS.systypes where xtype=231
+		--select codeno,slno from tbl_personal_education where codeno=@codeno and slno=@slno
+		OPEN FieldList
+		FETCH NEXT FROM FieldList
+		into @tablename, @fieldname, @fieldtype, @length, @is_identity,@is_primary_key
+
+		WHILE @@FETCH_STATUS = 0
+			BEGIN
+				if @sql1 is null 
+					begin
+--print 'find'
+				select  @sql1= '@' + @fieldname + ' ' + cast(@fieldtype as varchar) + case when cast(@length as varchar) is null then '' else ' (' +  isnull(cast(@length as varchar),'') + ')'end
+				--print @sql1
+					end
+				else	
+				begin
+				select @sql1=  @sql1 + '
+	,@' + @fieldname + ' ' + cast(@fieldtype as varchar) + case when cast(@length as varchar) is null then '' else ' (' +  isnull(cast(@length as varchar),'') + ')'end
+				--print @sql1
+					
+				end
+		FETCH NEXT FROM FieldList
+		into @tablename, @fieldname, @fieldtype, @length, @is_identity,@is_primary_key
+			end
+		close FieldList
+		deallocate FieldList
+set 	@sql=@sql + '
+	'+@sql1 + '
+
+as
+    DECLARE @ErrorCode     int
+    SET @ErrorCode = 0
+
+		if (not exists(select '+@fieldname+' from '+@tablename+' where '+@fieldname+'=@'+@fieldname+') or @'+@fieldname+' is null)
+			begin
+				RAISERROR (''Record does not exist. Unable to delete record.'',
+				16, 1)
+			end
+		else 
+			begin
+				delete from '+@tablename+' 		 
+				where '+@fieldname+' = @'+@fieldname+'
+				
+				IF( @@ERROR <> 0 )
+				BEGIN
+					SET @ErrorCode = -1
+					GOTO Cleanup
+				END
+
+			end
+
+    RETURN 0
+	Cleanup:
+		RETURN @ErrorCode
+'
+
+print @sql 
+print @0sql
+-------------------------Procedure:

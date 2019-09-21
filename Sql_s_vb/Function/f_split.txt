@@ -1,0 +1,48 @@
+Create function f_split(
+@str varchar(50),
+@dm varchar(1),
+@rno int
+)
+returns varchar(30)
+as
+begin
+
+declare @rval varchar(30)
+declare @geton varchar(1)
+declare @l int
+declare @cp int
+declare @i int
+declare @msg varchar(50)
+declare @ind int
+
+--set @str='shain|tali|kuet';
+
+declare @tbl table(col int,val varchar(30))
+set @l=LEN(@str)
+set @ind=0
+set @i=1
+set @msg=''
+set @str=@str+@dm
+while(@l>-1)
+begin
+--print @i
+set @geton=SUBSTRING(@str,@i,1)
+set @msg=@msg+@geton
+
+if(@geton=@dm)
+begin
+insert into @tbl values(@ind,@msg)
+set @msg=''
+set @ind=@ind+1
+end
+set @i=@i+1
+set @l=@l-1
+end
+
+update @tbl
+set val=substring(val,1,LEN(val)-1)
+
+select @rval=val from @tbl where col=@rno
+
+return isnull(@rval,'')
+end

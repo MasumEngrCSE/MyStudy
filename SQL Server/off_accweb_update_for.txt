@@ -1,0 +1,24 @@
+/*
+select * from AccClass
+select * from MainClass
+select * from SubClass where maincode='03' and subcode='603'
+*/
+declare @subcode varchar(3)
+set @subcode='647'
+begin
+declare @max_subcode varchar(3)
+--select * from SubClass where acccode='02' and maincode='15' --and subcode=@subcode
+select * from AccountDetails where acccode='02' and maincode='15' --and subcode='17'
+------------------------
+select @max_subcode=max(subcode)+1 from SubClass where acccode='02' and maincode='15'
+/*
+if @max_subcode>0 
+begin
+update SubClass set maincode='15',subcode=@max_subcode  where acccode='02' and maincode='03' and subcode=@subcode
+update AccountDetails set maincode='15',subcode=@max_subcode  where  acccode='02' and maincode='03' and subcode=@subcode
+end
+*/
+--print @max_subcode
+
+--sp_helptext sp_Save_Voucher_DetailsData
+end

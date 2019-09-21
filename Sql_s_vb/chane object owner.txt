@@ -1,0 +1,1 @@
+EXEC sp_changeobjectowner 'osl1.h_chalan_amount', 'dbo'

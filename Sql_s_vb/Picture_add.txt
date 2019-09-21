@@ -1,0 +1,96 @@
+
+
+:-------------Load picture from dick:------------------------
+ Dim oPict As StdPicture
+ On Error GoTo errH:
+    comDigCtlPic.Filter = "All Files (*.*)|*.*"
+    comDigCtlPic.ShowOpen
+    
+    Set oPict = LoadPicture(comDigCtlPic.FileName)
+    mf = comDigCtlPic.FileName
+    If oPict Is Nothing Then
+        MsgBox "No Picture"
+        Exit Sub
+    End If
+    
+    imgPerson.Picture = oPict
+    
+Exit Sub
+errH: Dim oPict As StdPicture
+ On Error GoTo errH:
+    comDigCtlPic.Filter = "All Files (*.*)|*.*"
+    comDigCtlPic.ShowOpen
+    
+    Set oPict = LoadPicture(comDigCtlPic.FileName)
+    mf = comDigCtlPic.FileName
+    If oPict Is Nothing Then
+        MsgBox "No Picture"
+        Exit Sub
+    End If
+    
+    imgPerson.Picture = oPict
+    
+Exit Sub
+errH:
+-----------:Save Picture-------------------------------------------------------------
+Dim RSA As ADODB.Recordset
+Dim strstream As New ADODB.Stream
+    
+          
+    Set RSA = New Recordset
+    RSA.Open "Select * from EMP_IMAGE_TBL where empid = '" & Trim(txt_empid.Text) & "'", _
+    cnn, adOpenKeyset, adLockOptimistic
+    If RSA.EOF Then
+        If mf <> "" Then
+            RSA.AddNew
+            RSA!empid = Trim(txt_empid.Text)
+            Set strstream = New ADODB.Stream
+            strstream.Type = adTypeBinary
+            strstream.Open
+            strstream.LoadFromFile mf
+            RSA.Fields("emp_img").Value = strstream.Read
+            RSA.Update
+            mf = ""
+        End If
+    Else
+        If mf <> "" Then
+            Set strstream = New ADODB.Stream
+            strstream.Type = adTypeBinary
+            strstream.Open
+            strstream.LoadFromFile mf
+            RSA.Fields("emp_img").Value = strstream.Read
+            RSA.Update
+            mf = ""
+        End If
+    End If
+'    MF = ""
+    RSA.Close
+    Set RSA = Nothing
+---------------------------:Show Picture-----------------------------------------------------------------
+Dim RSA As ADODB.Recordset
+Dim strsatream As New ADODB.Stream
+
+        Set RSA = New Recordset
+        RSA.Open "Select emp_img from EMP_IMAGE_TBL where empid  = '" & txt_empid.Text & "' ", _
+        cnn, adOpenKeyset, adLockOptimistic
+        If RSA.EOF Or RSA.BOF Then
+           imgPerson.Picture = LoadPicture("")
+            End If
+        
+        If Not RSA.EOF Then
+            If Not IsNull(RSA!emp_img) Then
+                Set strsatream = New ADODB.Stream
+                strsatream.Type = adTypeBinary
+                strsatream.Open
+                strsatream.Write (RSA.Fields("emp_img").Value)
+                strsatream.SaveToFile "C:\Temp.bmp", adSaveCreateOverWrite
+                imgPerson.Picture = LoadPicture("C:\Temp.bmp")
+                Kill ("C:\Temp.bmp")
+            Else
+                imgPerson.Picture = LoadPicture("")
+            End If
+
+        End If
+        RSA.Close
+        Set RSA = Nothing
+-------------------------------------------------

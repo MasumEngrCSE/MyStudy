@@ -1,0 +1,39 @@
+----------------Name:CHECK CONSTRAINT 
+
+*************when no data eced:
+ALTER TABLE CheckTbl
+add CONSTRAINT chkval1   CHECK (col1<6 )
+
+*************when data are exced:
+ALTER TABLE CheckTbl
+WITH NOCHECK
+ADD CONSTRAINT CK_CheckTbl_col1
+CHECK ((col1 <6))
+----------------Name:DEFAULT CONSTRAINT 
+
+ALTER TABLE tbl1 WITH NOCHECK
+ADD CONSTRAINT DF_tbl1_did
+DEFAULT (0) FOR did
+**********from function value:
+alter table t1 
+add constraint d_t1_pid  default dbo.f_t3_maxval() for [pid]
+----------------Name:
+
+----------------Name:
+
+----------------Name:
+
+----------------Name:
+
+----------------Name:
+
+----------------Name:
+
+----------------Name:
+
+----------------Name:
+
+----------------Name:
+
+----------------Name:
+

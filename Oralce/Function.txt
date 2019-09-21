@@ -1,0 +1,19 @@
+CREATE OR REPLACE FUNCTION test_r(intNum1 Varchar2)
+RETURN Varchar2
+AS
+Returnstr Varchar2(10);
+
+begin
+IF intNum1 = '1' THEN
+ Returnstr := 'mk';
+ELSIF intNum1 = '2' THEN
+ Returnstr := 'km';
+ELSIF intNum1 = '3' THEN
+ Returnstr := 'ms';
+else
+ Returnstr := 'No Rel';
+END IF;
+
+RETURN Returnstr;
+END;
+/

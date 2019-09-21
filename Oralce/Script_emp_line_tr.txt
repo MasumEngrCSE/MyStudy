@@ -1,0 +1,37 @@
+alter table LINE_TBL 
+add UNIT_DEPT_NO  VARCHAR2(3) 	REFERENCES UNIT_DEPT_TBL (UNIT_DEPT_NO)
+
+------------Table:emp_line_tr----------------------------
+create table emp_line_tr
+(
+pid         number(10)      primary key,
+emp_id      VARCHAR2(10)    not null REFERENCES emp_TBL (emp_id),
+LINE_NO     VARCHAR2(2)     not null REFERENCES LINE_TBL (LINE_NO),
+date_up     Date            not null
+)
+-------------------TRIGGER:update_emp_line-------------------
+CREATE OR REPLACE TRIGGER update_emp_line
+AFTER INSERT
+ON EMP_LINE_TR 
+REFERENCING NEW AS New OLD AS Old
+FOR EACH ROW
+DECLARE
+
+
+BEGIN
+if inserting then
+       Update  emp_tbl
+        set line_no=:new.line_no
+    where emp_id=:new.emp_id;
+end if;
+   EXCEPTION
+     WHEN OTHERS THEN
+     rollback;
+       -- Consider logging the error and then re-raise
+       RAISE;
+END update_emp_line;
+/
+
+
+
+--------------------------------------

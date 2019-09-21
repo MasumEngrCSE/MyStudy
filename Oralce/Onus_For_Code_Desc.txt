@@ -1,0 +1,78 @@
+CREATE OR REPLACE FUNCTION Fn_Gen_PID(P_Table VARCHAR2)
+RETURN NUMBER
+IS
+    V_Length NUMBER;
+    V_Max_PID NUMBER;
+    V_Check_YY_MM VARCHAR2(5);
+    V_YY_MM VARCHAR2(5);
+    V_PID NUMBER;
+BEGIN
+    SELECT DATA_PRECISION
+    INTO V_Length
+    FROM USER_TAB_COLUMNS
+    WHERE TABLE_NAME=P_Table
+    AND COLUMN_NAME='PID';
+    
+    Execute Immediate 'SELECT Substr(Max(PID), 1, 5), Substr(Max(PID+1), 6) FROM '||P_Table INTO V_Check_YY_MM, V_Max_PID;
+    
+    V_YY_MM:=To_Char(Sysdate, 'YYMM');
+    
+    IF V_Check_YY_MM=1||V_YY_MM THEN
+        SELECT 1||V_YY_MM||LPad(V_Max_PID, V_Length-5, 0)
+        INTO V_PID
+        FROM DUAL;
+    ELSE
+        SELECT 1||V_YY_MM||LPad(1, V_Length-5, 0)
+        INTO V_PID
+        FROM DUAL;
+    END IF;
+    
+    Return V_PID;
+END;
+/
+
+alter table style_dtl_acc
+add PID number(10)
+add Code_Depnt varchar2(1)
+/
+
+DECLARE
+	   CURSOR C
+	   IS
+	   SELECT * FROM STYLE_DTL_ACC WHERE PID IS NULL
+	   FOR UPDATE OF PID;
+	   
+	   V_PID NUMBER;
+BEGIN
+	 FOR I IN C LOOP
+	 	 V_PID:=Fn_Gen_PID('STYLE_DTL_ACC');
+		 
+	 	 UPDATE STYLE_DTL_ACC
+		 SET PID=V_PID
+		 WHERE CURRENT OF C;
+	 END LOOP;
+	 COMMIT;
+END;
+/
+
+ALTER TABLE style_dtl_acc
+drop CONSTRAINT PK_STYLE_DTL_ACC
+/
+
+drop index PK_STYLE_DTL_ACC
+/
+
+ALTER TABLE style_dtl_acc
+add CONSTRAINT PK_STYLE_DTL_ACC primary key (PID)
+/
+
+
+Create table Style_Dtl_Acc_Code
+(
+PID			Number(10)	Primary key,
+PID_Style_Dtl_Acc	Number(10)	not Null	references style_dtl_acc(PID),
+Color_Code		Number(6)	not Null	references Color_Tbl(Color_Code),
+Size_Spec		varchar2(10),
+Code_Desc		varchar2(50)
+)
+/

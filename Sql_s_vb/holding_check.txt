@@ -1,0 +1,80 @@
+alter Procedure hsp_update_h_no
+AS
+BEGIN
+
+Declare @HouseNo varchar(74)
+Declare @hsl varchar(15)
+DECLARE Cal_cursor CURSOR FOR
+
+select  master.dbo.kccdecrypt(D260f26,11) hsl,
+	master.dbo.kccdecrypt(D260F1,11) house_no,
+	master.dbo.kccdecrypt(D260F2,11) ward,
+	master.dbo.kccdecrypt(D260f28,11) area,
+	master.dbo.kccdecrypt(D260F3,11) road,
+	master.dbo.kccdecrypt(D260f4,11) Holding_New,
+	master.dbo.kccdecrypt(D260f27,11) app
+from data260
+order by D260f26
+
+sp_help data260
+Open Cal_Cursor
+
+FETCH NEXT FROM Cal_Cursor
+into @HouseNo,@hsl
+
+WHILE @@FETCH_STATUS = 0
+Begin
+	update data265 
+		set D265F1=@HouseNo
+		where D265F13=@hsl
+
+	FETCH NEXT FROM Cal_Cursor
+	into @HouseNo,@hsl
+End
+CLOSE Cal_Cursor
+DEALLOCATE Cal_Cursor
+END
+Go
+
+execute P_holding_ass_0314
+go
+
+-------------------------------
+
+select * 
+from hv_house_check
+where rtrim(house_no)<>rtrim(house_by_database)
+order by ward
+
+
+alter view hv_house_check
+with encryption
+as
+select  master.dbo.kccdecrypt(D260f26,11) hsl,
+	master.dbo.kccdecrypt(D260F1,11) house_no,
+	master.dbo.kccdecrypt(D260F2,11) ward,
+	master.dbo.kccdecrypt(D260f28,11) area,
+	master.dbo.kccdecrypt(D260F3,11) road,
+	master.dbo.kccdecrypt(D260f4,11) Holding_New,
+	master.dbo.kccdecrypt(D260f27,11) app,
+	rtrim(master.dbo.kccdecrypt(D260F2,11))+'-'+rtrim(master.dbo.kccdecrypt(D260f28,11))+'-'+
+	rtrim(master.dbo.kccdecrypt(D260F3,11))+'-'+rtrim(master.dbo.kccdecrypt(D260f4,11))
+	+'-'+rtrim(master.dbo.kccdecrypt(D260f27,11)) house_by_database
+
+from data260
+---------------------------
+
+create procedure update_multipol
+with encryption
+as
+begin
+update data265
+	set d265f6 = master.dbo.kccencrypt('01/01/1901',11)
+where isdate(master.dbo.kccdecrypt(d265f6,11)) = 0;
+
+update data265
+	set d265f7 = master.dbo.kccencrypt('01/01/1901',11)
+where isdate(master.dbo.kccdecrypt(d265f7,11)) = 0;
+end
+
+exec update_multipol

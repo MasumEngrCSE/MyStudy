@@ -1,0 +1,5 @@
+If KeyAscii <> 8 Then
+    If Not Chr(KeyAscii) Like "[0-9]" Then
+        KeyAscii = 0
+    End If
+End If

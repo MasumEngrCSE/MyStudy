@@ -1,0 +1,96 @@
+alter procedure delete_dublicate_h
+@Holding_Sl varchar(15)
+with Encryption
+as
+begin
+	--set @Holding_Sl=master.dbo.kccencrypt('29115',11)
+	set @Holding_Sl=master.dbo.kccencrypt(@Holding_Sl,11)
+  DELETE from Data260
+    Where D260F26=@Holding_Sl;
+
+  DELETE from Data265
+    Where D265F13=@Holding_Sl;
+
+  DELETE from Data267
+    Where D267F12=@Holding_Sl;
+
+  DELETE from Data261
+    Where D261F22=@Holding_Sl;
+  END
+---------------------------
+
+-------------------:for_gulshan:---------------
+alter procedure P_hdub_del
+@Holding_Sl varchar(15)
+--with Encryption
+as
+
+begin
+BEGIN TRANSACTION
+begin
+
+	set @Holding_Sl=master.dbo.kccencrypt(@Holding_Sl,11)
+  DELETE from Data260
+    Where D260F26=@Holding_Sl;
+
+  DELETE from Data265
+    Where D265F13=@Holding_Sl;
+
+  DELETE from Data267
+    Where D267F12=@Holding_Sl;
+
+  DELETE from Data261
+    Where D261F22=@Holding_Sl;
+end
+COMMIT TRANSACTION
+END
+---------------------------
+create procedure P_update_payment
+@B_H_Sl varchar(15),
+@A_H_Sl varchar(15)
+--with Encryption
+as
+begin
+BEGIN TRANSACTION
+begin
+ update Data261
+ set D261F22=@A_H_Sl
+ where D261F22=@B_H_Sl;
+end
+COMMIT TRANSACTION
+END
+---------------------------Only Payment
+
+alter procedure P_del_payment
+@Holding_Sl	varchar(15),
+@Pay_From	varchar(300),
+@Pay_To	varchar(300),
+@Pay_Amount	float(8),
+@MR_No	varchar(300)
+
+--with Encryption
+as
+begin
+BEGIN TRANSACTION
+begin
+
+	set @Holding_Sl=master.dbo.kccencrypt(@Holding_Sl,11)
+	set @Pay_From=master.dbo.kccencrypt(@Pay_From,11)
+	set @Pay_to=master.dbo.kccencrypt(@Pay_to,11)
+	set @Pay_Amount=master.dbo.kccencrypt(@Pay_Amount,11)
+	set @MR_No=master.dbo.kccencrypt(@MR_No,11)
+
+ delete from Data261
+ where D261F22=@Holding_Sl
+	and d261f6=@Pay_From
+	and d261f7=@Pay_To
+	and d261f8=@Pay_Amount
+	and d261f13=@MR_No;
+end
+COMMIT TRANSACTION
+END
+
+---------------------------
+
+
+

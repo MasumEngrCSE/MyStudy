@@ -1,0 +1,15 @@
+[two]
+form=d:\GRPOSL\login.fmx usesdi=yes
+userid=dekko/dekko@dekko
+width=1024
+height=768
+colorscheme=blue
+pageTitle=GMT :: DEVELOPED BY OSL
+imagebase=codebase
+#archive=frmall.jar,rolloverbutton.jar,getclientinfo.jar,infobutton.jar,images.jar,JScriptWindowPJC.jar,GetImageFileName.jar, FileDetails.jar,HISRAMA.jar,PrintPJC.jar
+webUtilArchive=frmwebutil.jar,jacob.jar
+baseHTMLjinitiator=webutiljini.htm
+lookAndFeel=Oracle
+splashscreen=ati_splash.gif
+logo=ati_logo.gif
+separateFrame=false

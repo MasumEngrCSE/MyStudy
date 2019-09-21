@@ -1,0 +1,262 @@
+------------------Name:f_forecast	--Date:12:09 PM 28/01/2013
+
+--select dbo.f_forecast(2013,'2007,2008,2009,2010,2011,2012','20,15,25,40,7,35')
+
+alter function f_forecast
+(
+@x	float,
+@y_sql varchar(50),
+@x_sql varchar(50))
+returns float
+as
+begin
+--declare @x_sql varchar(50),@y_sql varchar(50),@x	float
+declare @iv float,@i int,@in_i int
+declare @x_val float,@y_val float, @x_avgval float,@y_avgval float
+declare @x_sql2 varchar(12),@y_sql2 varchar(12)
+declare @len_xsql smallint, @len_ysql smallint
+declare @vchek varchar(1)
+declare @v_totcol int
+declare @tempTop float 
+declare @tempBottom float,@a float,@b float
+declare @forecast float
+/*
+@sqr_val float,,@for_forecast int,@tmp float,@iv_new float
+*/
+--declare @x_val int, @len_ysql smallint,@ii int
+--
+declare @tbl table
+(
+id		smallint,
+xcol	int,
+ycol	float,
+rtop	float,
+rbotom	float
+)
+----------------
+--set @x=2013
+--set @y_sql='2007,2008,2009,2010,2011,2012'
+--set @x_sql='10,30,35,29,20,48'
+
+set @len_xsql=LEN(@x_sql)
+set @len_ysql=LEN(@y_sql)
+------------
+set @i=1
+set @in_i=0
+set @x_sql2=''
+--print @x_sql
+while(@i<=@len_xsql)
+	begin
+	set @vchek=SUBSTRING(@x_sql,@i,1)
+	if (@vchek=',')
+	begin
+		set @in_i=@in_i+1
+			insert into @tbl(id,xcol) values(@in_i,@x_sql2)
+		set @x_sql2=''
+	end
+	else
+	begin
+		set @x_sql2=@x_sql2+@vchek
+		if (@i=@len_xsql)
+		begin
+			set @in_i=@in_i+1
+			insert into @tbl(id,xcol) values(@in_i,@x_sql2)
+		end
+	end
+	set @i=@i+1
+	end
+--print 'complete insert X value'
+-------------------------------
+set @i=1
+set @in_i=0
+set @y_sql2=''
+--print @y_sql
+while(@i<=@len_ysql)
+	begin
+	set @vchek=SUBSTRING(@y_sql,@i,1)
+	if (@vchek=',')
+	begin
+		set @in_i=@in_i+1
+			update @tbl set ycol=@y_sql2 where id=@in_i
+			
+		set @y_sql2=''
+	end
+	else
+	begin
+		set @y_sql2=@y_sql2+@vchek
+		if (@i=@len_ysql)
+		begin
+			set @in_i=@in_i+1
+			update @tbl set ycol=@y_sql2 where id=@in_i
+			update @tbl set ycol=0 where id=@in_i+1
+		end
+	end
+	set @i=@i+1
+	end
+	--print 'complete insert Y value'
+	select @v_totcol=MAX(id) from @tbl
+---------------------------------------
+
+	--print '-----------------'
+	--print @i-1
+	--print @iv
+	select @iv=sum(xcol) from @tbl
+	set @x_avgval=@iv/@v_totcol
+			--(@i-1)
+	--print 'X Avg :'+ COnvert(varchar,@x_avgval)
+	--print '-----------------------------'
+	-----------------------------------------------------
+	
+	----------------
+	--print @i-1
+	--print @iv
+	select @iv=sum(ycol) from @tbl
+	set @y_avgval=@iv/@v_totcol
+			--(@i-1)
+	--print 'Y Avg :'+COnvert(varchar,@y_avgval)
+	--print '-----------------'
+	--------------------------
+	--print ' --tempTop and tempBottom'
+	set @iv=0
+	--set @iv_new=0
+	set @i=1
+	set @tempTop=0
+	set @tempBottom=0
+	-------------------------------
+	update @tbl
+	set rtop=(ycol-@y_avgval)*(xcol-@x_avgval)
+		,rbotom=POWER((ycol-@y_avgval),2)
+	--
+	select @tempTop=SUM(rtop),@tempBottom=SUM(rbotom) from @tbl
+	--print @tempTop
+	--print @tempBottom
+
+	set @b= @tempTop / @tempBottom;
+    set @a = @x_avgval - @b * @y_avgval;
+	--print 'a and b'
+    --print @a
+	--print @b
+    --select @for_forecast=MAX(xcol)  from @tbl
+    
+	set @forecast = @a + (@b*@x);
+	--print @forecast
+	
+	
+	return round(@forecast,2)
+	--print round(@forecast,2)
+	--select * from @tbl
+	
+end
+go
+------------------Name:f_Split_coma	--Date:
+ALTER function f_Split_coma
+(
+@p_input varchar(20)
+)returns varchar(20)
+as
+
+begin
+
+declare @i int,@in_i int
+declare @x_sql2 varchar(12)
+declare @rval varchar(20)
+--,@ln int
+declare @vchek varchar(1),@len_xsql smallint
+--declare @p_input varchar(20)
+set @p_input='1'
+set @len_xsql=LEN(@p_input)
+set @i=1
+set @in_i=0
+set @x_sql2=''
+set @rval=''
+
+while(@i<=@len_xsql)
+	begin
+	set @vchek=SUBSTRING(@p_input,@i,1)
+	if (@vchek=',')
+	begin
+		if @rval=''
+		begin
+			set @rval=''''+@rval+@x_sql2
+		end
+		else
+		begin
+			set @rval=@rval+''''+','+''''+@x_sql2
+		end
+		set @x_sql2=''
+	end
+	else
+	begin
+		set @x_sql2=@x_sql2+@vchek
+		if (@i=@len_xsql)
+		begin
+			if @rval=''
+			begin
+				set @rval=@rval+''''+@x_sql2+''''
+			end
+			else
+			begin
+				set @rval=@rval+''''+','+''''+@x_sql2+''''
+			end
+		end
+	end
+	set @i=@i+1
+	end
+	
+--print @rval
+return @rval
+end
+go
+------------------Name:f_split	--Date:
+Create function f_split(
+@str varchar(50),
+@dm varchar(1),
+@rno int
+)
+returns varchar(30)
+as
+begin
+
+declare @rval varchar(30)
+declare @geton varchar(1)
+declare @l int
+declare @cp int
+declare @i int
+declare @msg varchar(50)
+declare @ind int
+
+--set @str='shain|tali|kuet';
+
+declare @tbl table(col int,val varchar(30))
+set @l=LEN(@str)
+set @ind=0
+set @i=1
+set @msg=''
+set @str=@str+@dm
+while(@l>-1)
+begin
+--print @i
+set @geton=SUBSTRING(@str,@i,1)
+set @msg=@msg+@geton
+
+if(@geton=@dm)
+begin
+insert into @tbl values(@ind,@msg)
+set @msg=''
+set @ind=@ind+1
+end
+set @i=@i+1
+set @l=@l-1
+end
+
+update @tbl
+set val=substring(val,1,LEN(val)-1)
+
+select @rval=val from @tbl where col=@rno
+
+return isnull(@rval,'')
+end
+go
+------------------Name:	--Date:
+------------------Name:	--Date:
+------------------Name:	--Date:

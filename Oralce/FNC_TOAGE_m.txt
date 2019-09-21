@@ -1,0 +1,69 @@
+CREATE OR REPLACE FUNCTION FNC_TOAGE ( v_date in date,p_format varchar2 default 'D')
+ Return varchar2
+ is
+  P_DAY number:=0;
+  P_MONTH number:=0;
+  P_YEAR number:=0;
+  age varchar2(300);
+  last_month_dd number;
+  sdate number;
+  vdate number;
+ Begin
+   select Trunc(Trunc(months_between(sysdate+1,v_date))/12), mod(Trunc(months_between(sysdate+1,v_date)),12)
+   into P_YEAR,P_MONTH from dual;
+
+   select to_number(to_char(last_day(to_date('01-' || decode(lpad(to_number(to_char(sysdate,'MM')) -1,2,'00'),'00',12,lpad(to_number(to_char(sysdate,'MM')) -1,2,'00')) || '-' ||
+   to_char(sysdate,'YYYY'),'DD/MM/YYYY')),'DD'))
+   into last_month_dd from dual;
+
+  IF p_format = 'Y' THEN
+       select to_number(to_char(sysdate,'dd'),'9999999'),to_number(to_char(v_date,'dd'),'9999999')
+       into sdate,vdate from dual;
+
+       IF sdate > vdate then
+          P_DAY := sdate - vdate;
+        elsif sdate = vdate then
+          P_DAY := sdate - vdate +1;
+        ELSE
+          P_DAY :=(sdate+last_month_dd)-vdate;
+        End IF;
+
+       if nvl(p_year,0) >0 then
+             age:=P_YEAR||' Y  ';
+       elsif nvl(p_year,0) =0 and nvl(P_MONTH,0) > 0 then
+            age:=P_MONTH||' M  '||P_DAY||' D';
+       elsif nvl(p_year,0) =0 and nvl(P_MONTH,0) = 0 then
+            age:=P_DAY||' D';
+       end if;       
+
+      age:=P_YEAR;
+
+       
+  ELSIF p_format = 'M' THEN
+      age:=P_YEAR||' Y  '||P_MONTH||' M ';
+  ELSE
+      select to_number(to_char(sysdate,'dd'),'9999999'),to_number(to_char(v_date,'dd'),'9999999')
+       into sdate,vdate from dual;
+
+       IF sdate > vdate then
+          P_DAY := sdate - vdate;
+        elsif sdate = vdate then
+          P_DAY := sdate - vdate +1;
+        ELSE
+          P_DAY :=(sdate+last_month_dd)-vdate;
+        End IF;
+
+       if nvl(p_year,0) >0 then
+             age:=P_YEAR||' Y  ';
+       elsif nvl(p_year,0) =0 and nvl(P_MONTH,0) > 0 then
+            age:=P_MONTH||' M  '||P_DAY||' D';
+       elsif nvl(p_year,0) =0 and nvl(P_MONTH,0) = 0 then
+            age:=P_DAY||' D';
+       end if;       
+
+      age:=P_YEAR||' Y  '||P_MONTH||' M  '||P_DAY||' D';
+  END IF;
+ return age;
+ End ;
+/
+

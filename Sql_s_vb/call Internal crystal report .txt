@@ -1,0 +1,73 @@
+   Dim Report As Report
+'    Public rsRetriveData As New Recordset
+'    Public rsRetriveData As New Recordset
+'    Public GReportShowForm As Form
+    Dim rsRetriveData As New Recordset
+    Dim GReportShowForm As Form
+    
+    Dim vGloSql As String
+    
+    Dim rst As New ADODB.Recordset
+    Dim v_code As String, v_sql As String
+
+    
+    vGloSql = " SELECT buyer_code,buyer_name,buyer_phone,buyer_fax,buyer_email,buyer_attn,buyer_address  FROM buyer"
+    
+    If Option2.Value = True Then
+    
+            v_sql = "select buyer_code from buyer where buyer_name='" & Trim(txtBuyer.Text) & "'"
+            rst.Open v_sql, con, 3, 3
+            
+            If Not rst.EOF And Not rst.BOF Then
+                v_code = rst.Fields(0)
+            End If
+            rst.Close
+        vGloSql = vGloSql & "  where buyer_code='" & v_code & "'"
+    End If
+    
+    rsRetriveData.Open vGloSql, con, 3, 3
+    
+    
+    If Option1.Value = True Then
+    
+                Set Report = New CrystalReport5
+                Set GReportShowForm = frm_reportshow
+                Report.DiscardSavedData
+               '' Report.txtReportName.SetText ("Rank Wise SVC Limit")
+                Report.DiscardSavedData
+'                Report.Database.SetDataSource rsRetriveData
+                GReportShowForm.CRViewer91.ReportSource = Report
+'                ShowPrograssBar 100
+    
+                GReportShowForm.CRViewer91.ViewReport
+                GReportShowForm.CRViewer91.Zoom 100
+            
+                GReportShowForm.CRViewer91.EnableGroupTree = False
+                GReportShowForm.CRViewer91.Width = GReportShowForm.Width
+
+                GReportShowForm.WindowState = 2
+                GReportShowForm.Show vbModal
+    ElseIf Option2.Value = True Then
+    
+    
+                Set Report = New CrystalReport5
+                Set GReportShowForm = frm_reportshow
+                Report.DiscardSavedData
+               '' Report.txtReportName.SetText ("Rank Wise SVC Limit")
+                Report.DiscardSavedData
+                Report.Database.SetDataSource rsRetriveData
+                GReportShowForm.CRViewer91.ReportSource = Report
+'                ShowPrograssBar 100
+    
+                GReportShowForm.CRViewer91.ViewReport
+                GReportShowForm.CRViewer91.Zoom 100
+            
+                GReportShowForm.CRViewer91.EnableGroupTree = False
+                GReportShowForm.CRViewer91.Width = GReportShowForm.Width
+
+                GReportShowForm.WindowState = 2
+                GReportShowForm.Show vbModal
+
+    End If
+    
+    rsRetriveData.Close

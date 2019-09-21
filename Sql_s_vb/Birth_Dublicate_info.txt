@@ -1,0 +1,14 @@
+5:22 PM 03/08/2009
+----------------------------------------------
+select serial_seq,serial_no,child_name,dob
+from tblmaster
+
+where serial_seq in (
+		     select serial_seq 
+		     from tblmaster 
+		     group by serial_seq
+		     having count(*)>1
+			)
+order by serial_seq
+-------------------------------------------------
+-------------------------------------------------

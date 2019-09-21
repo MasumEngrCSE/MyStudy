@@ -1,0 +1,8 @@
+select cv_polbulb.ward_no
+
+from cv_polbulb 
+
+left outer join cv_road 
+
+on cv_polbulb.road_no=cv_road.road_no
+

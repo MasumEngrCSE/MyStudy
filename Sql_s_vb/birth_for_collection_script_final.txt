@@ -1,0 +1,573 @@
+-----------------------------------
+---------- Report Show  ---------------
+---   P_rpt_tbl table---------------------------
+-----drop table P_rpt_tbl
+
+
+Create Table [dbo].[P_rpt_tbl](
+	From_ym [datetime],
+	To_ym 	[datetime]	
+) On [Primary]
+Go
+
+
+---  drop table Collection_info table------------------
+
+Create Table [dbo].[Collection_info](
+PID		[Bigint] 		Primary Key ,
+C_date		[Datetime]		UNIQUE,
+Amt		[int]			Not null,
+N_of_copy	[int]			Not null,
+Note		[Varchar]	(200)	Not null,
+c_p_date	[Datetime]
+)
+
+go
+----------------
+----------drop Procedure Bsp_Collection_info
+create  Procedure Bsp_Collection_info 
+@Option 	Char(1),
+@PID 		varChar(10),
+@C_date 	Datetime,
+@Amt 		VarChar(10),
+@N_of_copy 	VarChar(10),
+@Note		VarChar(200),
+@C_p_date	Datetime
+
+With Encryption
+AS
+BEGIN
+
+IF @Option = 'U'
+ BEGIN 
+  UPDATE Collection_info
+    Set pid 		= @PID,
+	C_date 		= @C_date,
+	Amt 		= @Amt,
+	N_of_copy 	= @N_of_copy,
+	note		= @Note,
+	c_p_date	= @C_p_date
+   Where PID=@PID
+ END
+IF @Option = 'I'
+  BEGIN
+    INSERT into Collection_info
+    Values
+    (	@PID,
+	@C_date,
+	@Amt,
+	@N_of_copy,
+	@Note,
+	@C_p_date
+    )	
+  END
+
+IF @Option = 'D'
+  BEGIN
+  DELETE from Collection_info
+    Where PID=@PID
+  END
+END
+GO
+----------------------------
+-----------------
+
+
+----------------------------
+
+-----------------------------
+
+-----------------------------------Alter Table quater:
+Alter Table quater 
+	add First_Q 		datetime
+Alter Table quater 
+	add Second_Q 		datetime
+Alter Table quater 
+	add Third_Q 		datetime
+
+Alter Table quater 
+	add First_Q_ldt 	datetime
+Alter Table quater 
+	add Second_Q_ldt 	datetime
+Alter Table quater 
+	add Third_Q_ldt 	datetime
+
+Alter Table quater 
+	add First_Q_AMT 	INT	
+Alter Table quater 
+	add Second_Q_AMT	INT
+Alter Table quater 
+	add Third_Q_AMT 	INT
+
+Alter Table quater 
+	add First_Q_noc 	INT
+Alter Table quater 
+	add Second_Q_noc 	INT
+Alter Table quater 
+	add Third_Q_noc 	INT
+
+Alter Table quater 
+	add Zone 		varchar(2)
+go
+--------------------------------------------
+-------------------11:01 PM 3/31/2009
+
+Alter Table 
+	tblmaster add Rcv_date	Datetime
+
+go
+----------------
+Alter Table 
+	tblmasterPrevious add Rcv_date	Datetime
+go
+-----------------------
+----------------------------------------Procedure   -- stat  --
+ALTER    procedure stat
+@startDate varchar(12),
+@endDate varchar(12)
+
+With Encryption
+as
+Begin
+declare @pMale int 
+declare @pFemale int 
+declare @pTot int
+declare @cMale int 
+declare @cFemale int 
+declare @cTot int
+declare @dMale int
+declare @dFemale int 
+declare @dtot int
+
+declare @First_Quater datetime
+declare @First_Quater_ldt datetime
+declare @First_Quater_amt int
+declare @First_Quater_noc int
+
+declare @Second_Quater datetime
+declare @Second_Quater_ldt datetime
+declare @Second_Quater_amt int
+declare @Second_Quater_noc int
+
+declare @Third_Quater datetime
+declare @Third_Quater_ldt datetime
+declare @Third_Quater_amt int
+declare @Third_Quater_noc int
+declare @Zone_inf Varchar(2)
+
+
+select @startDate=convert(varchar,year(@endDate))+'-'+convert(varchar,(convert(bigint,(convert(varchar,month(@endDate))))-2))+'-'+convert(varchar,'01')
+
+select @pMale = count(Serial_Seq) from tblMaster
+where Entry_Date < @startDate and child_Name_sex = 'Male'
+
+select @pFemale = count(Serial_Seq) from tblMaster
+where Entry_Date < @startDate and child_Name_sex = 'Female'
+
+select @pTot = @pMale + @pFemale
+
+select @cMale = count(Serial_Seq) from tblMaster
+where Entry_Date between @startDate and @endDate and child_Name_sex = 'Male'
+
+select @cFemale = count(Serial_Seq) from tblMaster
+where Entry_Date between @startDate and @endDate and child_Name_sex = 'Female'
+
+select @cTot = @cMale + @cFemale
+
+select @dMale = count(Serial_Seq) from tblMaster
+where Entry_Date between @startDate and @endDate and child_Name_sex = 'Male' and ci = 1
+
+select @dFemale = count(Serial_Seq) from tblMaster
+where Entry_Date between @startDate and @endDate and child_Name_sex = 'Female' and ci = 1
+
+select @dTot = @dMale + @dFemale
+
+
+select 	@First_Quater 	= isnull(min(c_date),@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-2)=Month(@endDate)-2
+
+select 	@First_Quater_amt  = sum(amt)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-2)=Month(@endDate)-2
+				group by year(c_date),month(c_date)
+
+select 	@First_Quater_noc  = sum(n_of_copy)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-2)=Month(@endDate)-2
+				group by year(c_date),month(c_date)
+
+select 	@Second_Quater 	=isnull(min(c_date),@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-1)=Month(@endDate)-1
+
+
+select 	@Second_Quater_amt= sum(amt)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-1)=Month(@endDate)-1
+				group by year(c_date),month(c_date)
+
+select 	@Second_Quater_noc = sum(n_of_copy)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-1)=Month(@endDate)-1
+				group by year(c_date),month(c_date)
+
+select 	@Third_Quater = isnull(min(c_date),@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate))=Month(@endDate)
+
+select 	@Third_Quater_amt = sum(amt)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate))=Month(@endDate)
+				group by year(c_date),month(c_date)
+select 	@Third_Quater_noc = sum(n_of_copy)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate))=Month(@endDate)
+				group by year(c_date),month(c_date)
+
+	If @endDate<=convert(datetime,('2009-03-31'))
+		Begin
+			select 	@First_Quater_ldt = isnull(c_p_date,@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-2)=Month(@endDate)-2
+
+			select 	@Second_Quater_ldt =isnull(c_p_date,@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-1)=Month(@endDate)-1	
+
+			select 	@Third_Quater_ldt = isnull(c_p_date,@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate))=Month(@endDate)
+
+		End
+	
+	else
+		Begin
+			select 	@First_Quater_ldt = isnull(max(c_date),@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-2)=Month(@endDate)-2
+
+			select 	@Second_Quater_ldt = isnull(max(c_date),@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-1)=Month(@endDate)-1
+
+			select 	@Third_Quater_ldt = isnull(max(c_date),@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate))=Month(@endDate)
+		End
+
+select 	@Zone_inf = zone_id
+		    from zone_info
+	
+
+update quater set 
+previous_Total_Male = @pMale,
+previous_Total_Female = @pFemale,
+previous_Total_MaleFemale = @pTot,
+Entry_Total_Male = @cMale,
+Entry_Total_female = @cFemale,
+Entry_Total_MaleFemale = @cTot,
+Dis_Total_Male = @dMale,
+Dis_Total_Female = @dFemale,
+Dis_Total_MaleFemale = @dTot,
+From_Month = Month(@startDate),
+To_Month = Month(@endDate),
+year1 = year(@endDate),
+First_Q = @First_Quater,
+First_Q_AMT=isnull(@First_Quater_amt,0),
+Second_Q=@Second_Quater,
+Second_Q_AMT=isnull(@Second_Quater_amt,0),
+Third_Q=@Third_Quater,
+Third_Q_AMT=isnull(@Third_Quater_amt,0),
+First_Q_ldt=@First_Quater_ldt,
+Second_Q_ldt=@Second_Quater_ldt,
+Third_Q_ldt=@Third_Quater_ldt,
+First_Q_noc=isnull(@First_Quater_noc,0) ,
+Second_Q_noc=isnull(@Second_Quater_noc,0),
+Third_Q_noc=isnull(@Third_Quater_noc,0),
+Zone=@Zone_inf
+--*/
+end
+go
+------------------------------
+---------------
+--drop view v_birth_total_amt
+create view v_birth_total_amt
+as
+select 
+	yearly_Entry_date,
+	month_Entry_date,
+	Day_Entry_date,
+	entry_date,
+	yearly_Entry_date+month_Entry_date year_month,
+	sum(male) Total_Male
+	, sum(Female) Total_Female
+	,sum(male)+sum(Female) Total_M_F
+	,sum(Amt_M) Amt_Male
+	,sum(Amt_F) Amt_Female
+	,sum(isnull(c_t.amt,0)) Day_collection
+	,sum(isnull(N_of_copy,0)) N_of_copy
+	,sum(Amt_M)+sum(Amt_F)+sum(isnull(c_t.amt,0)) Total_Amt_M_F
+from 
+(select 
+	convert(varchar,year(entry_date)) yearly_Entry_date,
+	convert(varchar,month(entry_date)) month_Entry_date,
+	convert(varchar,day(entry_date)) Day_Entry_date,
+	entry_date,	
+	count(*) male,
+	''Female,
+	count(*)*50 Amt_M,
+	'' Amt_F
+from tblmaster
+where (convert(bigint,(entry_date))-convert(bigint,(dob)))/365>=18
+	and Child_Name_sex='Male'
+group by convert(varchar,year(entry_date)),convert(varchar,month(entry_date)),convert(varchar,day(entry_date)),entry_date
+
+union all
+select 
+	convert(varchar,year(entry_date)) yearly_Entry_date,
+	convert(varchar,month(entry_date)) month_Entry_date,
+	convert(varchar,day(entry_date)) Day_Entry_date,
+	entry_date,	
+	'' male,
+	count(*)Female,
+	'' Amt_M,
+	count(*)*50 Amt_F
+from tblmaster
+where (convert(bigint,(entry_date))-convert(bigint,(dob)))/365>=18
+	and Child_Name_sex='Female'
+group by convert(varchar,year(entry_date)),convert(varchar,month(entry_date)),convert(varchar,day(entry_date)),entry_date
+) T1 	left outer join Collection_info c_t
+	on yearly_Entry_date+month_Entry_date+Day_Entry_date=convert(varchar,year(c_t.c_date))+convert(varchar,month(c_t.c_date))+convert(varchar,Day(c_t.c_date))
+
+group by yearly_Entry_date,month_Entry_date,Day_Entry_date,entry_date
+
+go
+------------------------
+---------------------------------------------------
+------------------------------------11:47 AM 23-4-2009
+------------------Collection_ to enty information
+
+create view Collection_to_enty_info
+With Encryption
+as
+select collection_info.c_date Collection_Date
+	,collection_info.n_of_copy Rcv_Form
+	,count(tblmaster.rcv_date) entry_form
+	,convert(int,collection_info.n_of_copy)-convert(int,count(tblmaster.rcv_date)) in_hand
+from tblmaster,collection_info
+where tblmaster.rcv_date=collection_info.c_date
+	and tblmaster.rcv_date>='2009-04-1'
+group by collection_info.c_date,collection_info.n_of_copy
+
+
+---------------------------
+----------------------------Final--------state------------12:31 PM 23-4-2009
+
+
+
+ALTER    procedure stat
+@startDate varchar(12),
+@endDate varchar(12)
+
+With Encryption
+as
+Begin
+declare @pMale int 
+declare @pFemale int 
+declare @pTot int
+declare @cMale int 
+declare @cFemale int 
+declare @cTot int
+declare @dMale int
+declare @dFemale int 
+declare @dtot int
+
+declare @First_Quater datetime
+declare @First_Quater_ldt datetime
+declare @First_Quater_amt int
+declare @First_Quater_noc int
+
+declare @Second_Quater datetime
+declare @Second_Quater_ldt datetime
+declare @Second_Quater_amt int
+declare @Second_Quater_noc int
+
+declare @Third_Quater datetime
+declare @Third_Quater_ldt datetime
+declare @Third_Quater_amt int
+declare @Third_Quater_noc int
+declare @Zone_inf Varchar(2)
+
+
+begin
+
+if @endDate<convert(datetime,('2010-03-10'))
+select @startDate=convert(varchar,year(@endDate))+'-'+convert(varchar,(convert(bigint,(convert(varchar,month(@endDate))))-2))+'-'+convert(varchar,'01')
+else
+	set @startDate='0'
+end
+
+select @pMale = count(Serial_Seq) from tblMaster
+where Entry_Date < @startDate and child_Name_sex = 'Male'
+
+select @pFemale = count(Serial_Seq) from tblMaster
+where Entry_Date < @startDate and child_Name_sex = 'Female'
+
+select @pTot = @pMale + @pFemale
+
+select @cMale = count(Serial_Seq) from tblMaster
+where Entry_Date between @startDate and @endDate and child_Name_sex = 'Male'
+
+select @cFemale = count(Serial_Seq) from tblMaster
+where Entry_Date between @startDate and @endDate and child_Name_sex = 'Female'
+
+select @cTot = @cMale + @cFemale
+
+select @dMale = count(Serial_Seq) from tblMaster
+where Entry_Date between @startDate and @endDate and child_Name_sex = 'Male' and ci = 1
+
+select @dFemale = count(Serial_Seq) from tblMaster
+where Entry_Date between @startDate and @endDate and child_Name_sex = 'Female' and ci = 1
+
+select @dTot = @dMale + @dFemale
+
+
+select 	@First_Quater 	= isnull(min(c_date),@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-2)=Month(@endDate)-2
+
+select 	@First_Quater_amt  = sum(amt)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-2)=Month(@endDate)-2
+				group by year(c_date),month(c_date)
+
+select 	@First_Quater_noc  = sum(n_of_copy)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-2)=Month(@endDate)-2
+				group by year(c_date),month(c_date)
+
+select 	@Second_Quater 	=isnull(min(c_date),@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-1)=Month(@endDate)-1
+
+
+select 	@Second_Quater_amt= sum(amt)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-1)=Month(@endDate)-1
+				group by year(c_date),month(c_date)
+
+select 	@Second_Quater_noc = sum(n_of_copy)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-1)=Month(@endDate)-1
+				group by year(c_date),month(c_date)
+
+select 	@Third_Quater = isnull(min(c_date),@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate))=Month(@endDate)
+
+select 	@Third_Quater_amt = sum(amt)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate))=Month(@endDate)
+				group by year(c_date),month(c_date)
+select 	@Third_Quater_noc = sum(n_of_copy)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate))=Month(@endDate)
+				group by year(c_date),month(c_date)
+
+	If @endDate<=convert(datetime,('2009-03-31'))
+		Begin
+			select 	@First_Quater_ldt = isnull(c_p_date,@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-2)=Month(@endDate)-2
+
+			select 	@Second_Quater_ldt =isnull(c_p_date,@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-1)=Month(@endDate)-1	
+
+			select 	@Third_Quater_ldt = isnull(c_p_date,@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate))=Month(@endDate)
+
+		End
+	
+	else
+		Begin
+			select 	@First_Quater_ldt = isnull(max(c_date),@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-2)=Month(@endDate)-2
+
+			select 	@Second_Quater_ldt = isnull(max(c_date),@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate)-1)=Month(@endDate)-1
+
+			select 	@Third_Quater_ldt = isnull(max(c_date),@endDate)
+				from Collection_info
+				where c_date between @startDate and @endDate
+				and isnull(month(c_date),Month(@endDate))=Month(@endDate)
+		End
+
+select 	@Zone_inf = zone_id
+		    from zone_info
+	
+
+update quater set 
+previous_Total_Male = @pMale,
+previous_Total_Female = @pFemale,
+previous_Total_MaleFemale = @pTot,
+Entry_Total_Male = @cMale,
+Entry_Total_female = @cFemale,
+Entry_Total_MaleFemale = @cTot,
+Dis_Total_Male = @dMale,
+Dis_Total_Female = @dFemale,
+Dis_Total_MaleFemale = @dTot,
+From_Month = Month(@startDate),
+To_Month = Month(@endDate),
+year1 = year(@endDate),
+First_Q = @First_Quater,
+First_Q_AMT=isnull(@First_Quater_amt,0),
+Second_Q=@Second_Quater,
+Second_Q_AMT=isnull(@Second_Quater_amt,0),
+Third_Q=@Third_Quater,
+Third_Q_AMT=isnull(@Third_Quater_amt,0),
+First_Q_ldt=@First_Quater_ldt,
+Second_Q_ldt=@Second_Quater_ldt,
+Third_Q_ldt=@Third_Quater_ldt,
+First_Q_noc=isnull(@First_Quater_noc,0) ,
+Second_Q_noc=isnull(@Second_Quater_noc,0),
+Third_Q_noc=isnull(@Third_Quater_noc,0),
+Zone=@Zone_inf
+--*/
+end
+go
+
+--------------------------------------

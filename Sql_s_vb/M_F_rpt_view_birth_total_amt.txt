@@ -1,0 +1,36 @@
+create view v_birth_total_amt
+as
+select 
+	yearly_Entry_date,
+	sum(male) Total_Male
+	, sum(Female) Total_Female
+	,sum(male)+sum(Female) Total_M_F
+	,sum(Amt_M) Amt_Male
+	,sum(Amt_F) Amt_Female
+	,sum(Amt_M)+sum(Amt_F) Total_Amt_M_F
+from 
+(select 
+	convert(varchar,year(entry_date)) yearly_Entry_date,
+	count(*) male,
+	''Female,
+	count(*)*50 Amt_M,
+	'' Amt_F
+from tblmaster
+where (convert(bigint,(entry_date))-convert(bigint,(dob)))/365>=18
+	and Child_Name_sex='Male'
+group by convert(varchar,year(entry_date))
+
+union all
+select 
+	convert(varchar,year(entry_date)) yearly_Entry_date,
+	'' male,
+	count(*)Female,
+	'' Amt_M,
+	count(*)*50 Amt_F
+from tblmaster
+where (convert(bigint,(entry_date))-convert(bigint,(dob)))/365>=18
+	and Child_Name_sex='Female'
+group by convert(varchar,year(entry_date))
+) T1
+group by yearly_Entry_date
+

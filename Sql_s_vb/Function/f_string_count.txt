@@ -1,0 +1,24 @@
+create function f_string_count
+(
+@str varchar(50),
+@c varchar(10)
+)
+returns int
+as
+begin
+declare @rval int
+declare @len_c int,@i int
+set @len_c=len(@c)
+set @i=0
+set @rval=0
+while(@i<=len(@str))
+begin
+	if (substring(@str,@i,@len_c)=@c)
+	begin
+		set @rval=@rval+1
+	end
+	set @i=@i+@len_c
+end
+
+return isnull(@rval,'')
+end

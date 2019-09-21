@@ -1,0 +1,151 @@
+------------------Name:f_forecast	--Date:12:09 PM 28/01/2013
+Create function f_forecast
+(
+@x	float,
+@y_sql varchar(50),
+@x_sql varchar(50))
+returns float
+as
+begin
+--declare @x_sql varchar(50),@y_sql varchar(50),@x	float
+declare @iv float,@i int,@in_i int
+declare @x_val float,@y_val float, @x_avgval float,@y_avgval float
+declare @x_sql2 varchar(12),@y_sql2 varchar(12)
+declare @len_xsql smallint, @len_ysql smallint
+declare @vchek varchar(1)
+declare @v_totcol int
+declare @tempTop float 
+declare @tempBottom float,@a float,@b float
+declare @forecast float
+/*
+@sqr_val float,,@for_forecast int,@tmp float,@iv_new float
+*/
+--declare @x_val int, @len_ysql smallint,@ii int
+--
+declare @tbl table
+(
+id		smallint,
+xcol	int,
+ycol	float,
+rtop	float,
+rbotom	float
+)
+----------------
+--set @x=2013
+--set @x_sql='2007,2008,2009,2010,2011,2012'
+--set @y_sql='10,30,35,29,20,48'
+
+set @len_xsql=LEN(@x_sql)
+set @len_ysql=LEN(@y_sql)
+------------
+set @i=1
+set @in_i=0
+set @x_sql2=''
+--print @x_sql
+while(@i<=@len_xsql)
+	begin
+	set @vchek=SUBSTRING(@x_sql,@i,1)
+	if (@vchek=',')
+	begin
+		set @in_i=@in_i+1
+			insert into @tbl(id,xcol) values(@in_i,@x_sql2)
+		set @x_sql2=''
+	end
+	else
+	begin
+		set @x_sql2=@x_sql2+@vchek
+		if (@i=@len_xsql)
+		begin
+			set @in_i=@in_i+1
+			insert into @tbl(id,xcol) values(@in_i,@x_sql2)
+		end
+	end
+	set @i=@i+1
+	end
+--print 'complete insert X value'
+-------------------------------
+set @i=1
+set @in_i=0
+set @y_sql2=''
+--print @y_sql
+while(@i<=@len_ysql)
+	begin
+	set @vchek=SUBSTRING(@y_sql,@i,1)
+	if (@vchek=',')
+	begin
+		set @in_i=@in_i+1
+			update @tbl set ycol=@y_sql2 where id=@in_i
+			
+		set @y_sql2=''
+	end
+	else
+	begin
+		set @y_sql2=@y_sql2+@vchek
+		if (@i=@len_ysql)
+		begin
+			set @in_i=@in_i+1
+			update @tbl set ycol=@y_sql2 where id=@in_i
+			update @tbl set ycol=0 where id=@in_i+1
+		end
+	end
+	set @i=@i+1
+	end
+	--print 'complete insert Y value'
+	select @v_totcol=MAX(id) from @tbl
+---------------------------------------
+
+	--print '-----------------'
+	--print @i-1
+	--print @iv
+	select @iv=sum(xcol) from @tbl
+	set @x_avgval=@iv/@v_totcol
+			--(@i-1)
+	--print 'X Avg :'+ COnvert(varchar,@x_avgval)
+	--print '-----------------------------'
+	-----------------------------------------------------
+	
+	----------------
+	--print @i-1
+	--print @iv
+	select @iv=sum(ycol) from @tbl
+	set @y_avgval=@iv/@v_totcol
+			--(@i-1)
+	--print 'Y Avg :'+COnvert(varchar,@y_avgval)
+	--print '-----------------'
+	--------------------------
+	--print ' --tempTop and tempBottom'
+	set @iv=0
+	--set @iv_new=0
+	set @i=1
+	set @tempTop=0
+	set @tempBottom=0
+	-------------------------------
+	update @tbl
+	set rtop=(ycol-@y_avgval)*(xcol-@x_avgval)
+		,rbotom=POWER((ycol-@y_avgval),2)
+	--
+	select @tempTop=SUM(rtop),@tempBottom=SUM(rbotom) from @tbl
+	--print @tempTop
+	--print @tempBottom
+
+	set @b= @tempTop / @tempBottom;
+    set @a = @x_avgval - @b * @y_avgval;
+	--print 'a and b'
+    --print @a
+	--print @b
+    --select @for_forecast=MAX(xcol)  from @tbl
+    
+	set @forecast = @a + (@b*@x);
+	--print @forecast
+	
+	
+	return round(@forecast,2)
+	--print round(@forecast,2)
+	--select * from @tbl
+	
+end
+------------------Name:	--Date:
+------------------Name:	--Date:
+------------------Name:	--Date:
+------------------Name:	--Date:
+------------------Name:	--Date:

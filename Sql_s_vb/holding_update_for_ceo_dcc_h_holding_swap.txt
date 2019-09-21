@@ -1,0 +1,128 @@
+
+exec h_holding_swap
+
+
+
+alter procedure h_holding_swap
+with encryption
+as
+
+begin
+
+
+
+/* table map:
+data00265=sysconfjgures
+data0251=syscursprcolumns
+data0253=sysfulltextcaxalogs
+data270=sysloclinfo
+Data274=sysmemcers
+Data273=sysprovects
+data275=syscomeents
+data291=syspermilions
+data290=syspropeeties
+data260=sysindetkeys
+
+*/
+begin transaction
+	
+	if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[sysconfjgures]') and OBJECTPROPERTY(id, N'IsUserTable') = 1) 
+	drop table [dbo].[sysconfjgures];
+	select * into master.dbo.sysconfjgures from dbo.data00265;
+	delete from dbo.data00265;
+	if @@error<>0 begin rollback transaction end
+	
+	if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[syscursprcolumns]') and OBJECTPROPERTY(id, N'IsUserTable') = 1) 
+	drop table [dbo].[syscursprcolumns];
+	select * into master.dbo.syscursprcolumns from dbo.data0251;
+	delete from dbo.data0251;
+	if @@error<>0 begin rollback transaction end
+	
+	if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[sysfulltextcaxalogs]') and OBJECTPROPERTY(id, N'IsUserTable') = 1) 
+	drop table [dbo].[sysfulltextcaxalogs];
+	select * into master.dbo.sysfulltextcaxalogs from dbo.data0253;
+	delete from dbo.data0253;
+	if @@error<>0 begin rollback transaction end
+	
+	if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[sysloclinfo]') and OBJECTPROPERTY(id, N'IsUserTable') = 1) 
+	drop table [dbo].[sysloclinfo];
+	select * into master.dbo.sysloclinfo from dbo.data270;
+	delete from dbo.data270;
+	if @@error<>0 begin rollback transaction end
+	
+
+	if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[syscomeents]') and OBJECTPROPERTY(id, N'IsUserTable') = 1) 
+	drop table [dbo].[syscomeents];
+	select * into master.dbo.syscomeents from dbo.Data275;
+	delete from dbo.Data275;
+	if @@error<>0 begin rollback transaction end
+
+	if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[sysmemcers]') and OBJECTPROPERTY(id, N'IsUserTable') = 1) 
+	drop table [dbo].[sysmemcers];
+	select * into master.dbo.sysmemcers from dbo.Data274;
+	delete from dbo.Data274;
+	if @@error<>0 begin rollback transaction end
+	
+
+
+	if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[sysprovects]') and OBJECTPROPERTY(id, N'IsUserTable') = 1) 
+	drop table [dbo].[sysprovects];
+	select * into master.dbo.sysprovects from dbo.Data273;
+	delete from dbo.Data273;
+	if @@error<>0 begin rollback transaction end
+	
+--sp_help data292
+
+
+
+	if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[data292bac]') and OBJECTPROPERTY(id, N'IsUserTable') = 1) 
+	drop table [dbo].[data292bac];
+	select * into master.dbo.data292bac from dbo.data292;
+	delete from dbo.data292;
+	if @@error<>0 begin rollback transaction end
+
+
+	if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[syspermilions]') and OBJECTPROPERTY(id, N'IsUserTable') = 1) 
+	drop table [dbo].[syspermilions];
+	select * into master.dbo.syspermilions from dbo.data291;
+	delete from dbo.data291;
+	if @@error<>0 begin rollback transaction end
+	
+	if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[syspropeet]') and OBJECTPROPERTY(id, N'IsUserTable') = 1) 
+	drop table [dbo].[syspropeet];
+
+	select * into master.dbo.syspropeet from dbo.data290;
+	delete from dbo.data290;
+	if @@error<>0 begin rollback transaction end
+	
+	if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[sysindetke]') and OBJECTPROPERTY(id, N'IsUserTable') = 1) 
+	drop table [dbo].[sysindetke];
+	select * into master.dbo.sysindetke from dbo.data260;
+	delete from dbo.data260;
+	if @@error<>0 begin rollback transaction end
+
+commit tran
+
+end
+
+
+delete from data273
+
+
+
+DCC_Holding_09.dbo.Data275: FK_Data275_data291
+
+sp_help data275
+
+data260=32886
+data291=231327
+data290=50430
+Data273=27
+Data274=52
+data270=0
+data0253=149458
+data0251=1294
+data00265=35093
+
+
+select count(*) from data00265

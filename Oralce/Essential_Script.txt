@@ -1,0 +1,326 @@
+------------------Create user:
+create user dbuser identified by 12345;
+/
+grant dba to dbuser ;
+------------------Pree Insert(PID):
+
+declare
+	v_dt date;
+	v_PID number(12);
+begin
+	select sysdate into v_dt from dual;
+	select nvl(max(PID),'1'||to_char(v_dt,'YYMM')||'00000') into v_PID from Acc_Requz_Tbl
+	where substr(pid,1,5) = '1'||to_char(v_dt,'YYMM');
+	:Acc_Requz_Tbl.PID := v_PID + 1;
+exception
+	when others then
+	:Acc_Requz_Tbl.PID := '1'||to_char(v_dt,'YYMM')||'00001';
+end;
+
+-------------------------------------
+
+---------------Pree Insert (1,2,3)
+declare
+	v_Max_Num number(8);
+begin
+	select nvl(max(buyer_no),0) into v_Max_Num from buyer_tbl;
+	:buyer_tbl.buyer_no := v_Max_Num + 1;
+	
+exception
+	when others then
+	null;
+end;
+-------------------------------------
+
+-----------------post change:
+begin
+	select Distinct buyer_tbl.buyer_name
+
+	into :Acc_Requz_Tbl.txt_buyer
+
+from buyer_tbl,order_tbl
+
+where 	:Acc_Requz_Tbl.file_no = order_tbl.file_no
+and order_tbl.buyer_no = buyer_tbl.buyer_no;
+
+exception
+	when others then null;
+end;
+
+----------------
+
+---------------Cursor Quary:
+
+	go_block('Acc_Requz_Item');
+	begin
+	declare
+ cursor c1 is
+select  distinct 
+				a.ACC_code
+				,a.ACC_NAME
+from 		Access_tbl a, acc_consum_tbl ac
+where a.ACC_CODE = ac.ACC_CODE(+) and ac.M_ID =:acc_requz_Tbl.M_ID;
+			
+	   
+
+begin
+	GO_BLOCK('Acc_Requz_Item');
+	First_Record;
+     for cu1 in c1 loop
+     	:Acc_Requz_Item.ACC_code 		 := cu1.ACC_code;
+     	:Acc_Requz_Item.Txt_ACC_Name := cu1.ACC_Name;
+     	     
+    NEXT_RECORD;
+      end loop;
+	First_Record;
+	exception
+  when others then
+	null;
+	end;
+	end;
+
+-----------------------------------
+
+---------------------Show All Record In A text by    (,)coma:
+declare
+	var_rec_No number(4);
+begin
+		GO_BLOCK('Acc_Requz_Item');
+		last_record;
+	var_rec_no := to_number(:system.cursor_record);
+	
+	first_record;
+for rec in 1..var_rec_no loop
+   
+     if nvl(:acc_requz_item.Status,'N') = 'Y'  then
+     	
+		:txt_item_summary := nvl(:acc_requz_Tbl.txt_item_summary,'') ||nvl(:acc_requz_item.TXT_acc_name,'')||',';
+		  
+     end if;
+     
+		next_record;
+	end loop;
+end;
+----------------------------------
+
+------------------- Show list Of value:
+declare
+	v_lov	boolean;
+begin
+	if :txt_buyer is null or :txt_Buyer = '' then
+		v_lov := show_lov('Buyer_LIST');
+	end if;
+	next_item;
+exception
+	when others then
+	null;
+end;
+
+-----------------------------------------
+
+-------------------Item On or Off:
+
+begin 
+if :FROM_FILE = 'F' then 
+  	Set_item_Property('Acc_Tr_Mst.TR_FROM',enabled,property_on);
+    --	Set_item_Property('Acc_Tr_Mst.TR_TO',enabled,property_on); 
+ 
+else if :FROM_FILE = 'S' then 
+ 	--Set_item_Property('Acc_Tr_Mst.TR_TO',enabled,property_off);
+ 		Set_item_Property('Acc_Tr_Mst.TR_FROM',enabled,property_off);
+ else
+	null;
+ end if;
+ end if;
+
+ end;
+--------------------------------------------
+
+------------------Delete record by Alote message:
+declare
+	v_alart		number;
+begin
+	go_block ('acc_tr_dtl');
+		set_alert_property ('alt', title, 'Delete?');
+		set_alert_property ('alt', alert_message_text, 'Do You Really Want To Delete The Record??');
+		v_alart := show_alert('alt');
+		if v_alart = alert_button1 then
+			delete_record;
+		end if;
+	end;
+---------------------------------------
+
+------------------Fill_Combo(procedure):
+
+PROCEDURE Fill_Combo(cmb varchar,SQL1 varchar) IS
+	rg	RecordGroup;
+	err_No		NUMBER;
+	fi item;
+BEGIN
+	fi := find_item(cmb);
+	rg := Find_Group('rg');
+	IF Id_Null(rg) THEN
+--		rg := Create_Group_From_Query('rg','select Unit_Name,unit from unit_converter_tbl');
+		rg := Create_Group_From_Query('rg',SQL1);
+	END IF;
+	err_No := Populate_Group(rg);
+	Clear_List(fi);
+	Populate_List(fi,rg);
+
+END;
+--------------------------------------------
+
+
+--------------------Fill Commbo Quary:
+
+Fill_Combo('ACC_TR_DTL.MARKET_UNIT','select	unit,UNIT from unit_converter_tbl');
+
+----------------------------
+
+-------------------Form Show Full Window:
+
+set_window_property('WINDOW1',window_state,maximize);
+set_window_property(FORMS_MDI_WINDOW,WINDOW_STATE,MAXIMIZE); 
+
+----------------------
+---------------------Form Titel(Function Body):
+function FORM_Title return char is
+	vForm_Title varchar2(200);
+begin
+	begin
+		select form_title into vForm_Title
+		from form_tbl
+		where form_name = :SYSTEM.CURRENT_FORM;
+	exception
+		when others then
+		vForm_Title := '';
+	end;
+  return vForm_Title;
+end;
+-------------------------------------
+
+
+-------------- Form Title Show In A Text:
+
+:txt_01 := Form_Title;
+
+-----------------
+
+
+----------------Report Parameter Call:
+
+PROCEDURE Show_Reports IS
+
+BEGIN
+
+COMMIT;
+ DECLARE
+  pl_id   ParamList; 
+  pl_name VARCHAR2(10) := 'tempdata';
+	BEGIN
+  
+  pl_id := Get_Parameter_List(pl_name); 
+  IF NOT Id_Null(pl_id) THEN 
+      DESTROY_PARAMETER_LIST(PL_ID);
+  END IF;
+  
+
+ 	pl_id := Create_Parameter_List(pl_name);  
+   
+--  Add_Parameter(pl_id,'DESTYPE',TEXT_PARAMETER,:global.pre);
+-- 	Add_Parameter(pl_id,'P_Company',TEXT_PARAMETER,:global.Company);
+ 	Add_Parameter(pl_id,'PARAMFORM',TEXT_PARAMETER,'NO');
+
+ 	Add_Parameter(pl_id,'P_File_No',TEXT_PARAMETER,:txt_File_No);
+ 	Add_Parameter(pl_id,'P_order_no',TEXT_PARAMETER,:txt_order_no);
+ 	Add_Parameter(pl_id,'P_style_No',TEXT_PARAMETER,:txt_Style_No);
+
+	Run_Product(REPORTS, 'reports/'||:Global.param1, SYNCHRONOUS, RUNTIME, FILESYSTEM, pl_id, NULL); 
+ END;  
+end ; 
+-------------------------------------
+
+---------------Sql union All:
+select '  '|| s.sec_name, sum(M) Male, sum(F) Female, nvl(sum(M),0) + nvl(sum(F),0) Total
+from section_tbl s,
+(select sec_no, count(emp_no) M, 0 F
+from emp_tbl
+where upper(sex) = 'M' and present_status <> 'T'
+group by sec_no
+union all
+select sec_no, 0 M,count(emp_no)
+from emp_tbl
+where upper(sex) = 'F' and present_status <> 'T'
+group by sec_no
+) T1
+where T1.sec_no = s.sec_no
+group by s.sec_name
+--------------------
+
+
+
+----------------Report run as form 10g:
+declare
+	v_url varchar2(500);
+	v_form_name varchar2(100);
+	pl_id paramlist;
+	pl_name varchar2(10) := 'temp';
+	BEGIN
+v_form_name:=get_application_property(current_form);
+pl_id := get_parameter_list(pl_name);
+	v_url:=	'/reports/rwservlet?'||'rpt1'
+--	||'&desformat='||'html'
+	||'&desformat='||'pdf'
+	||'&destype='||'cache'
+	||'&P_id='||:data51.pid
+	||'&report='||'D:\grposl\Rpt\Exp_M_Lc.rdf';
+		web.show_document(v_url, '_blank');	
+end;
+---------------------
+
+
+
+-------------Show record by max date where pid=duplicate,desig=duplicate/uniq
+
+select j.empid,dept,desig,class
+from empjobhistory j,
+(select empid,max(APPROVEDDATE) App
+from empjobhistory j
+group by empid) T1
+where j.EMPID = t1.empid and j.APPROVEDDATE = t1.app
+
+---------------------------------------
+
+
+----------------Tablespase:
+
+CREATE TABLESPACE CWMLITE DATAFILE 
+  'F:\ORACLE\ORADATA\ORCL\CWMLITE01.DBF' SIZE 20M AUTOEXTEND ON NEXT 640K MAXSIZE UNLIMITED
+LOGGING
+ONLINE
+PERMANENT
+EXTENT MANAGEMENT LOCAL AUTOALLOCATE
+BLOCKSIZE 8K
+SEGMENT SPACE MANAGEMENT AUTO;
+----------------------------------------------
+
+
+--------------------sql_run  2:45 PM 1/11/2009
+@D:\desig_tbl.sql
+------------
+report_istall:
+-----------------]
+rwserver server=rpt1-install
+----------------
+
+
+-----------------------Insert: By Where -----------------------------------
+insert into (select UNIT_DEPT_NO,UNIT_NAME
+            from unit_dept_tbl
+            where UNIT_DEPT_NO='9'
+            )
+        values('10','test2');
+------------------create: synonym ----------------------------
+create synonym unit_name
+for unit_dept_tbl
+------------------

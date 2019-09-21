@@ -1,0 +1,11 @@
+---------------------- 11:35 AM 3/14/2009 --Rofiq ------------
+update data265
+set d265f6 = master.dbo.kccencrypt('01/01/1901',11)
+where isdate(master.dbo.kccdecrypt(d265f6,11)) = 0
+go
+
+update data265
+set d265f7 = master.dbo.kccencrypt('01/01/1901',11)
+where isdate(master.dbo.kccdecrypt(d265f7,11)) = 0
+go
+

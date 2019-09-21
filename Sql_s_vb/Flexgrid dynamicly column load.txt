@@ -1,0 +1,29 @@
+    Dim rs          As New ADODB.Recordset
+    Dim field_      As ADODB.Field
+    Dim i           As Integer
+    
+    rs.Open UpdateFile
+    
+    If Not rs.EOF Then
+        msflexRecords.Cols = rs.Fields.Count
+        For Each field_ In rs.Fields
+            msflexRecords.TextMatrix(0, i) = field_.Name
+            i = i + 1
+        Next
+        msflexRecords.Cols = msflexRecords.Cols + 1
+        msflexRecords.TextMatrix(0, msflexRecords.Cols - 1) = "Status"
+        Do Until rs.EOF
+            i = 0
+            msflexRecords.Rows = msflexRecords.Rows + 1
+            msflexRecords.Row = msflexRecords.Rows - 1
+            For Each field_ In rs.Fields
+'                msflexRecords.ColumnHeaders.Add , , field_.Item(0).Name
+                msflexRecords.TextMatrix(msflexRecords.Row, i) = field_.Value
+                i = i + 1
+            Next
+            Checking_Status rs.Fields("pid").Value, rs.Fields("item_desc").Value
+
+            rs.MoveNext
+            
+        Loop
+    End If

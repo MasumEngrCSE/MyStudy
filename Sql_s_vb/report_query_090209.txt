@@ -1,0 +1,127 @@
+
+------------------------------1:00 AM 2/10/2009
+create view hv_backup_file_rpt
+as
+select 
+	hv_Holding01.House_No
+	,hv_Holding01.Ward_No
+	,hv_Area.area_name
+	,hv_Road.Road_Name
+	,hv_Holding01.Holding_New
+	,hv_Holding01.Holding_Old
+	,hv_Holding01.Owner_Name
+	,hv_Holding01.Occupied_By
+	,hv_Holding01.Father_Name
+	,hv_Assessment01.Assess_Period
+	,hv_Assessment01.Assess_Value valu_five_per_year
+	,hv_Assessment01.Quater_Value valu_Three_per_year
+	,hv_Assessment01.Rev_Assess_Value Fixt_tax
+	,hv_Assessment01.Last_Rev_Assess_Value Last_Rev_tax
+	, hv_Holding01.Holding_Sl
+	,hv_Holding01_backup.House_No House_No_backup
+	,hv_Holding01_backup.Ward_No Ward_No_backup
+	,hv_Holding01_backup.Road_no Road_no_backup
+	,hv_Holding01_backup.Area Area_backup
+	,hv_Holding01_backup.Holding_New Holding_New_backup
+	,hv_Holding01_backup.Holding_Old Holding_Old_backup
+	,hv_Holding01_backup.Owner_Name Owner_Name_backup
+	,hv_Holding01_backup.Occupied_By Occupied_By_backup
+	,hv_Holding01_backup.Father_Name Father_Name_backup
+	,hv_Assessment01_backup.Assess_Period Assess_Period_backup
+	,hv_Assessment01_backup.Assess_Value valu_five_per_year_backup
+	,hv_Assessment01_backup.Quater_Value valu_Three_per_year_backup
+	,hv_Assessment01_backup.Rev_Assess_Value Fixt_tax_backup
+	,hv_Assessment01_backup.Last_Rev_Assess_Value Last_Rev_tax_backup
+from 	
+	hv_Holding01,hv_Assessment01
+	,hv_Holding01_backup,hv_Assessment01_backup
+	,hv_Area,hv_Road
+
+where 	
+	hv_Holding01.holding_sl=hv_Assessment01.holding_sl
+	and hv_Holding01.holding_sl*=hv_Holding01_backup.holding_sl
+	and hv_Assessment01.holding_sl*=hv_Assessment01_backup.holding_sl
+	and hv_Holding01.area=hv_Area.area_no
+	and hv_Holding01.Road_No= hv_Road.Road_No
+
+------------
+--------------------------------------------11:48 PM 2/10/2009
+select
+	hv_Holding01.House_No
+	,hv_Assessment01.Assess_Period
+	,hv_Holding_Dtl01.sl_no
+	,hv_Holding_Type.h_type_name
+from 	
+	hv_Holding01,hv_Assessment01,hv_Holding_Dtl01,hv_Holding_Type
+where	
+	hv_Holding01.holding_sl=hv_Assessment01.holding_sl
+	and hv_Holding01.house_no=hv_Holding_Dtl01.house_no
+	and hv_Holding_Dtl01.Holding_Type=hv_Holding_Type.h_type_code
+
+------------------------
+
+---------------------report_query2------------12:23 AM 2/11/2009
+create view hv_backup_file_rpt
+as
+select 
+	hv_Holding01.House_No
+	,hv_Holding01.Ward_No
+	,hv_Area.area_name
+	,hv_Road.Road_Name
+	,hv_Holding01.Holding_New
+	,hv_Holding01.Holding_Old
+	,hv_Holding01.Owner_Name
+	,hv_Holding01.Occupied_By
+	,hv_Holding01.Father_Name
+	,hv_Holding01.Mother_Name
+	,hv_Holding01.National_ID
+	,hv_Holding01.House_Name
+	,hv_Ownership_Type.o_type_name
+	,hv_Assessment_Type.housetype
+	,hv_Assessment01.Assess_Period
+	,hv_Assessment01.Assess_Value valu_five_per_year
+	,hv_Assessment01.Quater_Value valu_Three_per_year
+	,hv_Assessment01.Rev_Assess_Value Fixt_tax
+	,hv_Assessment01.Last_Rev_Assess_Value Last_Rev_tax
+	, hv_Holding01.Holding_Sl
+	,hv_Holding01_backup.House_No House_No_backup
+	,hv_Holding01_backup.Ward_No Ward_No_backup
+	,hv_Holding01_backup.Road_no
+	,hv_Holding01_backup.Area
+	,hv_Holding01_backup.Holding_New Holding_New_backup
+	,hv_Holding01_backup.Holding_Old Holding_Old_backup
+	,hv_Holding01_backup.Owner_Name Owner_Name_backup
+	,hv_Holding01_backup.Occupied_By Occupied_By_backup
+	,hv_Holding01_backup.Father_Name Father_Name_backup
+	,hv_Holding01_backup.Mother_Name Mother_Name_backup
+	,hv_Holding01_backup.National_ID National_ID_backup
+	,hv_Holding01_backup.owner_type
+	,hv_Holding01_backup.House_Name House_Name_backup
+	,hv_Holding01_backup.assid
+	,hv_Assessment01_backup.Assess_Period Assess_Period_backup
+	,hv_Assessment01_backup.Assess_Value valu_five_per_year_backup
+	,hv_Assessment01_backup.Quater_Value valu_Three_per_year_backup
+	,hv_Assessment01_backup.Rev_Assess_Value Fixt_tax_backup
+	,hv_Assessment01_backup.Last_Rev_Assess_Value Last_Rev_tax_backup
+	,hv_Holding_Type.h_type_name
+	,hv_Holding_Type.hot_key
+from 	
+	hv_Holding01,hv_Assessment01
+	,hv_Holding01_backup,hv_Assessment01_backup
+	,hv_Area,hv_Road,hv_Holding_Dtl01,hv_Holding_Type
+	,hv_Ownership_Type,hv_Assessment_Type
+where 	
+	hv_Holding01.holding_sl=hv_Assessment01.holding_sl
+	and hv_Holding01.holding_sl*=hv_Holding01_backup.holding_sl
+	and hv_Assessment01.holding_sl*=hv_Assessment01_backup.holding_sl
+	and hv_Holding01.area=hv_Area.area_no
+	and hv_Holding01.Road_No= hv_Road.Road_No
+	and hv_Holding01.house_no=hv_Holding_Dtl01.house_no
+	and hv_Holding_Dtl01.Holding_Type*=hv_Holding_Type.h_type_code
+	and hv_Holding01.owner_type*=hv_Ownership_Type.o_type_code
+	and hv_Holding01.assid*=hv_Assessment_Type.assid
+
+
+
+
+------------------------------------------------------------------------------

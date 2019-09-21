@@ -1,0 +1,176 @@
+--------Script:only single row select in list view by check box:
+
+Dim lst As ListItem
+
+For Each lst In ListView1.ListItems
+    If lst.Index <> Item Then
+        lst.Checked = False
+    End If
+Next
+--------Script: Only integer type data alow------------------------
+If KeyAscii <> 8 Then
+    If Not Chr(KeyAscii) Like "[0-9]" Then
+        KeyAscii = 0
+    End If
+End If
+-------------------VB YESNO
+If MsgBox("Are you want to delete This Holding Gap?", vbYesNo) = vbNo Then Exit Sub
+--------Script: Execute by procedure manualy------------------------
+go
+DECLARE @RC int
+DECLARE @Option char(1)
+DECLARE @EMP_ID varchar(10)
+DECLARE @INCREMENT_TYPE varchar(10)
+DECLARE @EFFECTIVE_DATE datetime
+DECLARE @APPROVAL_DATE datetime
+DECLARE @DEPT_ID varchar(10)
+DECLARE @DESIG_ID varchar(10)
+DECLARE @STATUS_TYPE varchar(10)
+DECLARE @SCALE_YEAR varchar(10)
+DECLARE @BASIC int
+DECLARE @INCRE_AMT int
+DECLARE @MAXTIME int
+DECLARE @CREATE_BY varchar(10)
+DECLARE @CREATE_DATE datetime
+DECLARE @TOTAL_SALARY int
+DECLARE @ZONE_ID varchar(10)
+-- Set parameter values
+EXEC @RC = [pmis_dcc].[dbo].[PSP_EMP_job] @Option, @EMP_ID, @INCREMENT_TYPE, @EFFECTIVE_DATE, @APPROVAL_DATE, @DEPT_ID, @DESIG_ID, @STATUS_TYPE, @SCALE_YEAR, @BASIC, @INCRE_AMT, @MAXTIME, @CREATE_BY, @CREATE_DATE, @TOTAL_SALARY, @ZONE_ID
+
+execute PSP_EMP_job 'I',03625,02,'03/04/2009','03/04/2009','011','037','01',2005,16800,650,'','00001','05/07/2009',16800,'11'
+
+--------Script: inser sql genarate by manual------------------------
+select 'insert into year_tbl values('+ cast(Code as varchar(10)) +', '+
+''''+c_year+''''+')' from year_tbl
+
+--------Script:increment my loop------------------------
+CREATE TABLE tst_insert (
+	tid decimal IDENTITY (1, 1) constraint pk_tst_insert_tid primary key NOT NULL ,
+	tnum1 decimal NULL,
+	tnum2 varchar(500),
+	tnum3 varchar(500), 
+	tnum4 varchar(500)
+)
+go
+--drop table tst_insert
+alter procedure sp_tst_insert
+@num decimal
+as
+begin
+declare @num2 decimal;
+set @num2=1;
+delete from tst_insert;
+while (@num>0)
+	begin
+	insert into tst_insert (tnum1,tnum2,tnum3,tnum4)  values(@num2,'Bangladesh','is my mother land.','i like my Country');
+	set @num2=@num2+1;
+	set @num=@num-1;
+	end
+end
+--------Script:FOREIGN KEY  :CONSTRAINT ------------------------
+ALTER TABLE Books ADD CONSTRAINT fk_author 
+FOREIGN KEY (AuthorID) 
+REFERENCES Authors (AuthorID) ON DELETE CASCADE 
+
+--------Script:formula value pass in crystall report------------------------
+report.Formulas(0) = "title=" & "'" & APPLICATION_TITLE & "'"
+--------Script:index ------------------------
+create index ind_sales_mem_code on sales(mem_code)
+DROP INDEX sales.ind_sales_mem_code
+--------Script:MAXRECURSION (quary WITH) ------------------------
+
+WITH mpq (msl, p_year, p_month)
+AS
+(
+SELECT SL_NO
+      ,convert(varchar,2000+right(PAID_UPTO,2)) as pyear
+      ,case upper(left(PAID_UPTO,3)) when 'JAN' then '01' when 'FEB' then '02' when 'MAR' then '03' when 'APR' then '04'
+				when 'MAY' then '05' when 'JUN' then '06' when 'JUL' then '07'
+				when 'AUG' then '08' when 'SEP' then '09' when 'OCT' then '10'
+				when 'NOV' then '11' when 'DEC' then '12' when 'NOV' then '11' when 'DCE' then '12' else '00'
+		end m_moth
+  FROM dbcccl.dbo.Sheet3$
+  where isnumeric(right(PAID_UPTO,2))=1
+)
+--Uses MAXRECURSION to limit the recursive levels to 2
+SELECT msl, p_year, p_month,
+
+case  	when convert(int,p_month)<4 then p_year+'01'
+	when convert(int,p_month)<7 then p_year+'02'
+	when convert(int,p_month)<10 then p_year+'03'
+	else p_year+'04'
+end
+FROM mpq 
+--------Script:procedure parameter pass  VB6 to crystal report------------------------
+
+     Report.ParameterFields(1).AddCurrentValue (DtpFrom.Value)
+     Report.ParameterFields(2).AddCurrentValue (DtpTo.Value)
+     Report.ParameterFields(3).AddCurrentValue (1)
+--------Script:Flex Grid  Dynamicly Column Load------------------------
+    Dim rs          As New ADODB.Recordset
+    Dim field_      As ADODB.Field
+    Dim i           As Integer
+    
+    rs.Open UpdateFile
+    
+    If Not rs.EOF Then
+        msflexRecords.Cols = rs.Fields.Count
+        For Each field_ In rs.Fields
+            msflexRecords.TextMatrix(0, i) = field_.Name
+            i = i + 1
+        Next
+        msflexRecords.Cols = msflexRecords.Cols + 1
+        msflexRecords.TextMatrix(0, msflexRecords.Cols - 1) = "Status"
+        Do Until rs.EOF
+            i = 0
+            msflexRecords.Rows = msflexRecords.Rows + 1
+            msflexRecords.Row = msflexRecords.Rows - 1
+            For Each field_ In rs.Fields
+'                msflexRecords.ColumnHeaders.Add , , field_.Item(0).Name
+                msflexRecords.TextMatrix(msflexRecords.Row, i) = field_.Value
+                i = i + 1
+            Next
+            Checking_Status rs.Fields("pid").Value, rs.Fields("item_desc").Value
+
+            rs.MoveNext
+            
+        Loop
+    End If
+--------Script:primar key add------------------------
+alter table Main_Class
+add  mid int 
+alter column mid int not null
+add constraint pk_Main_Class_mid primary key(mid)
+
+--------Script:restore database from file(BAK...)------------------------
+
+RESTORE DATABASE dbname
+FROM DISK = N'D:\dbname_file.bak'
+WITH FILE = 1, NOUNLOAD, REPLACE, STATS = 10,
+MOVE N'dbname' TO N'D:\DataBase\dbname.mdf',
+MOVE N'dbname_log' TO N'D:\DataBase\dbname.ldf'
+
+--------Script:Masket Box Date Format------------------------
+Public Function DateFromatYMD(FullText As String) As String
+    Dim d As String, m As String, y As Integer, sql As String
+    d = Mid(FullText, 1, 2)
+    m = Mid(FullText, 4, 2)
+    y = Val(Mid(FullText, 7, 10))
+    
+   
+    sql = sql + Trim(Str(y))
+    
+    'If Len(Trim(Str(m))) = 1 Then DateFromatYMD = DateFromatYMD + "0"
+    
+    sql = sql + "/" + Trim(CStr(m)) + "/"
+    
+    'If Len(Trim(Str(d))) = 1 Then DateFromatYMD = "0"
+
+    sql = sql  + Trim(CStr(d))
+    DateFromatYMD = sql
+
+End Function
+--------Script:------------------------
+--------Script:------------------------
+
+    

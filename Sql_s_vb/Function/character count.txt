@@ -1,0 +1,24 @@
+create function f_character_count
+(
+@str varchar(100),
+@c varchar(1)
+)
+returns int
+as
+begin
+declare @rval int
+declare @i int
+
+set @i=1
+set @rval=0
+while(@i<=len(@str))
+begin
+if (substring(@str,@i,1)=@c)
+begin
+set @rval=@rval+1
+end
+set @i=@i+1
+end
+
+return isnull(@rval,'')
+end

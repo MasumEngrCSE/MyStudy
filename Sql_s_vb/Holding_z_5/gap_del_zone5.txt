@@ -1,0 +1,22 @@
+alter procedure p_gap_del
+@house_no varchar(100),
+@qtr	  varchar(10)= null
+with encryption
+as
+begin
+if @qtr is null
+	begin
+	delete from dbo.hv_Gap_Payment 
+		where ltrim(rtrim(house_no))=ltrim(rtrim(@house_no))
+			--and ltrim(rtrim(fy_qtr))=ltrim(rtrim(@qtr))
+	end
+else
+	begin
+	delete from dbo.hv_Gap_Payment 
+		where ltrim(rtrim(house_no))=ltrim(rtrim(@house_no))
+			and ltrim(rtrim(fy_qtr))=ltrim(rtrim(@qtr))
+	end
+
+	delete from billbook 
+	where house_no like substring(@house_no,1,11) + '%';
+end

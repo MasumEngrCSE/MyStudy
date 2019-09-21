@@ -1,0 +1,18 @@
+alter TRIGGER trg_table_create
+ON database 
+FOR CREATE_TABLE
+AS 
+
+    PRINT 'thanks u r good boy /girl';
+    --SELECT EVENTDATA().value('(/EVENT_INSTANCE/TSQLCommand/CommandText)[1]','nvarchar(max)')
+go
+
+
+create TRIGGER trg_table_drop
+ON database 
+FOR drop_TABLE
+AS 
+
+    PRINT 'hi hi korlen ki?';
+    --SELECT EVENTDATA().value('(/EVENT_INSTANCE/TSQLCommand/CommandText)[1]','nvarchar(max)')
+go

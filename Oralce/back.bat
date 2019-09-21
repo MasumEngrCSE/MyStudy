@@ -1,0 +1,1 @@
+C:\OraHome\db9i\bin\EXP.EXE userid =onus/banani@orc file=d:\oooo.dmp

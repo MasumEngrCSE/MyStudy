@@ -1,0 +1,23 @@
+Alter procedure p_del_billbook
+@ward varchar(2),
+@area varchar(3),
+@road varchar(4)
+with encryption
+as
+
+begin
+insert into ARV_Cases
+	select house_no --,substring(house_no,1,2),substring(house_no,4,3),substring(house_no,8,4)
+	from billbook 
+	where substring(house_no,1,2)=@ward
+		and substring(house_no,4,3)=@area
+		and substring(house_no,8,4)=@road
+		and len(ltrim(rtrim(gaps)))>199;
+
+delete from billbook where substring(house_no,1,2)=@ward
+		and substring(house_no,4,3)=@area
+		and substring(house_no,8,4)=@road;
+end
+--go
+
+--p_del_billbook '53'

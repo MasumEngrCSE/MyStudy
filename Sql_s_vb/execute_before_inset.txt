@@ -1,0 +1,265 @@
+alter Procedure PSP_EMP_job
+@Option 	Char(1),
+@EMP_ID		VARCHAR(10),
+@INCREMENT_TYPE  VARCHAR(10),
+@EFFECTIVE_DATE  DATEtime,
+@APPROVAL_DATE   DATEtime,
+@DEPT_ID         VARCHAR(10),
+@DESIG_ID        VARCHAR(10),
+@STATUS_TYPE     VARCHAR(10),
+@SCALE_YEAR      VARCHAR(10),
+@BASIC           int,
+@INCRE_AMT       int,
+@MAXTIME         int,
+@CREATE_BY       VARCHAR(10),
+@CREATE_DATE     DATEtime,
+@TOTAL_SALARY    int,
+@ZONE_ID         VARCHAR(10)
+
+With Encryption
+AS
+BEGIN
+ declare @VAR_TotBasic 	Bigint
+ declare @VAR_HRent 	Bigint
+ declare @Class_id	VARCHAR(2)
+ declare @HRent		Bigint
+ declare @Medical	Bigint
+ declare @STATUS	VARCHAR(1)
+ declare @var_temp	bigint
+ declare @VAR_PERSENT 	bigint
+ declare @VAR_MINAMT 	bigint
+ declare @VAR_Medical 	bigint
+ declare @VAR_Conveyance bigint
+ declare @VAR_Tipin 	bigint
+ declare @VAR_MaxDate	datetime
+
+ begin
+    select @Class_id= CLASS_ID
+		from   L_Designation
+    		where  DESIG_ID =@DESIG_ID
+    set @VAR_TotBasic = @TOTAL_SALARY
+
+    -----------------House rent:
+    SELECT @var_temp =count(*)
+	FROM 	HOUSERENT 
+	WHERE 	SCALEYEAR = @SCALE_YEAR 
+		AND @VAR_TotBasic BETWEEN BASICFROM AND BASICTO 
+		AND CLASSCODE = @Class_id
+
+ IF @var_temp > 0 
+  begin
+   SELECT @VAR_PERSENT=PERSENT
+   FROM   HOUSERENT 
+   WHERE SCALEYEAR = @SCALE_YEAR 
+  	AND @VAR_TotBasic BETWEEN BASICFROM AND BASICTO 
+ 	AND CLASSCODE = @Class_id;
+   SELECT @VAR_MINAMT=MINAMT 
+   FROM   HOUSERENT 
+   WHERE SCALEYEAR = @SCALE_YEAR 
+  	AND @VAR_TotBasic BETWEEN BASICFROM AND BASICTO 
+ 	AND CLASSCODE = @Class_id;
+ end
+ ELSE
+ begin
+  set @VAR_PERSENT = 0
+  set @VAR_MINAMT = 0
+ end
+
+  set @VAR_HRent = @VAR_TotBasic * @VAR_PERSENT / 100
+
+ IF @VAR_HRent < @VAR_MINAMT
+  begin
+   set @VAR_HRent = @VAR_MINAMT
+  end
+  --------------------Medical:
+   SELECT @var_temp=COUNT(*) 
+   FROM OtherAllow 
+   WHERE SCALEYEAR = @SCALE_YEAR 
+	 AND CLASSCODE =@Class_id
+	 AND HEADCODE ='03'--03='wPwKrmv fvZv'
+
+ IF @var_temp > 0
+  begin
+   SELECT @VAR_Medical=isnull(AMOUNT,0) 
+   FROM OtherAllow 
+   WHERE SCALEYEAR = @SCALE_YEAR 
+	AND CLASSCODE = @Class_id
+  	AND HEADCODE ='03'-- 'wPwKrmv fvZv'
+  end
+ ELSE
+  begin
+   set @VAR_Medical = 0;
+  end
+   ----------------------Conveyance:
+   SELECT @var_temp=COUNT(*) 
+   FROM OtherAllow 
+   WHERE SCALEYEAR = @SCALE_YEAR 
+	AND CLASSCODE = @Class_id
+	AND HEADCODE='05'-- 'qvZvqvZ fvZv');
+
+ IF @var_temp > 0
+  begin
+   SELECT @VAR_Conveyance=isnull(AMOUNT,0) 
+   FROM OtherAllow 
+   WHERE SCALEYEAR = @SCALE_YEAR 
+	AND CLASSCODE = @Class_id
+ 	AND HEADCODE='05'--'qvZvqvZ fvZv');
+  end
+ else
+  begin
+   set @VAR_Conveyance=0
+  end
+  ----------------------Tipi---OtherAllow:
+   SELECT --@var_temp=
+	*
+   FROM  OtherAllow 
+   WHERE SCALEYEAR =@SCALE_YEAR 
+	AND CLASSCODE = @Class_id
+	AND HEADCODE='06'-- 'wUwdb'
+ IF @var_temp > 0
+  begin
+   SELECT @VAR_Tipin=isnull(AMOUNT,0)
+   FROM OtherAllow 
+   WHERE SCALEYEAR = @SCALE_YEAR 
+	AND CLASSCODE = @Class_id
+ 	AND HEADCODE ='06'--'wUwdb'
+  end
+ else
+  begin 
+   set @VAR_Tipin=0
+  end
+  
+------------------------------
+end
+-----------------------------------
+IF @Option = 'U'
+  BEGIN
+  UPDATE job
+     Set INCREMENT_TYPE=@INCREMENT_TYPE,
+	 EFFECTIVE_DATE=@EFFECTIVE_DATE,
+	 APPROVAL_DATE=@APPROVAL_DATE,
+	 DEPT_ID=@DEPT_ID,
+	 DESIG_ID=@DESIG_ID,
+	 STATUS_TYPE=@STATUS_TYPE,
+	 SCALE_YEAR=@SCALE_YEAR,
+	 BASIC=@BASIC,
+	 INCRE_AMT=@INCRE_AMT,
+	 MAXTIME=@MAXTIME,
+	 CREATE_BY=@CREATE_BY,
+	 CREATE_DATE=@CREATE_DATE,
+	 TOTAL_SALARY=@TOTAL_SALARY,
+	 ZONE_ID=@ZONE_ID
+     Where EMP_ID=@EMP_ID
+	   and APPROVAL_DATE=@APPROVAL_DATE;
+     begin
+	SELECT  @VAR_MaxDate=MAX(APPROVEDDATE)  
+	FROM EMPJOBHISTORY 
+	WHERE EMPID = @EMP_ID;
+	if @VAR_MaxDate=@EFFECTIVE_DATE
+		begin
+		set @STATUS='E'
+		end
+	else
+		begin
+		set @STATUS='H'
+		end
+	
+     end
+   UPDATE EMPJOBHISTORY 
+     Set APPROVEDDaTE =@APPROVAL_DATE,
+	   EFFECTIVEDATE =@EFFECTIVE_DATE,
+	   INCREMENTTYPE =@INCREMENT_TYPE,
+	   DEPT =@DEPT_ID,
+	   DESIG =@DESIG_ID,
+	   Class =@Class_id,
+	   PAYSCALEYEAR =@SCALE_YEAR,
+	   BASIC =@BASIC,
+	   TotBasic =@TOTAL_SALARY,
+	   HRent =@HRent,
+	   Medical =@Medical,
+	   CONVETANCE =@VAR_Conveyance,
+	   Tipin =@VAR_Tipin,
+	   STATUS =@STATUS,
+	   JONE =@ZONE_ID
+     Where EMPID=@EMP_ID
+	   and APPROVEDDaTE=@APPROVAL_DATE;
+  END
+IF @Option = 'I'
+  BEGIN
+   INSERT into job
+    Values
+    (	@EMP_ID,
+	@INCREMENT_TYPE,
+	@EFFECTIVE_DATE,
+	@APPROVAL_DATE,
+	@DEPT_ID,
+	@DESIG_ID,
+	@STATUS_TYPE,
+	@SCALE_YEAR,
+	@BASIC,
+	@INCRE_AMT,
+	@MAXTIME,
+	@CREATE_BY,
+	@CREATE_DATE,
+	@TOTAL_SALARY,
+	@ZONE_ID
+    )
+	begin
+	UPDATE EMPJOBHISTORY SET STATUS = 'H' 
+	WHERE EMPID = @EMP_ID;
+	set @STATUS='E'
+	end
+ INSERT into EMPJOBHISTORY 
+    Values
+    (	@APPROVAL_DATE,
+	@EFFECTIVE_DATE,
+	@EMP_ID,
+	@INCREMENT_TYPE,
+	@DEPT_ID,
+	@DESIG_ID,
+	@Class_id,
+	@SCALE_YEAR,
+	@BASIC,
+	@TOTAL_SALARY,
+	@HRent,
+	@Medical,
+	@VAR_Conveyance,
+	@VAR_Tipin,
+	@STATUS,
+	@ZONE_ID
+    )
+  END
+IF @Option = 'D'
+  BEGIN
+  DELETE from job
+    	Where EMP_ID=@EMP_ID
+	      and APPROVAL_DATE=@APPROVAL_DATE
+  DELETE from EMPJOBHISTORY 
+    	Where EMPID=@EMP_ID
+	      and APPROVEDDaTE=@APPROVAL_DATE
+  END
+END
+
+------------------------------------------
+go
+DECLARE @RC int
+DECLARE @Option char(1)
+DECLARE @EMP_ID varchar(10)
+DECLARE @INCREMENT_TYPE varchar(10)
+DECLARE @EFFECTIVE_DATE datetime
+DECLARE @APPROVAL_DATE datetime
+DECLARE @DEPT_ID varchar(10)
+DECLARE @DESIG_ID varchar(10)
+DECLARE @STATUS_TYPE varchar(10)
+DECLARE @SCALE_YEAR varchar(10)
+DECLARE @BASIC int
+DECLARE @INCRE_AMT int
+DECLARE @MAXTIME int
+DECLARE @CREATE_BY varchar(10)
+DECLARE @CREATE_DATE datetime
+DECLARE @TOTAL_SALARY int
+DECLARE @ZONE_ID varchar(10)
+-- Set parameter values
+EXEC @RC = [pmis_dcc].[dbo].[PSP_EMP_job] @Option, @EMP_ID, @INCREMENT_TYPE, @EFFECTIVE_DATE, @APPROVAL_DATE, @DEPT_ID, @DESIG_ID, @STATUS_TYPE, @SCALE_YEAR, @BASIC, @INCRE_AMT, @MAXTIME, @CREATE_BY, @CREATE_DATE, @TOTAL_SALARY, @ZONE_ID
+
+execute PSP_EMP_job 'I',03625,02,'03/04/2009','03/04/2009','011','037','01',2005,16800,650,'','00001','05/07/2009',16800,'11'

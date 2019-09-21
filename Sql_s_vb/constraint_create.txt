@@ -1,0 +1,4 @@
+ALTER TABLE ci_detail_proforma_master
+ADD CONSTRAINT fK_ci_detail_proforma_master_proforma_master_id
+FOREIGN KEY (proforma_master_id)
+REFERENCES proforma_master(proforma_master_id)

@@ -1,0 +1,2 @@
+Kill Left(App.Path, 3) & "*.tmp"
+Kill App.Path & "\*.tmp"

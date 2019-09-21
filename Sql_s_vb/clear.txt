@@ -1,0 +1,25 @@
+Private Sub All_clear()
+Dim i As Long
+Dim x As Control
+Dim xMsk As String
+
+
+For Each x In Controls
+    If TypeOf x Is TextBox Then If x.Name <> "txtHTaxNo" Then x.Text = ""
+'    If TypeOf X Is MSForms.ComboBox Then X.Text = ""
+    If TypeOf x Is MaskEdBox Then
+        xMsk = x.Mask
+        x.Mask = ""
+        x.Text = ""
+        x.Mask = xMsk
+    End If
+    If TypeOf x Is ComboBox Then x.ListIndex = -1
+Next
+
+    MSFlexGrid1.Clear
+    MSFlexGrid1.FormatString = "µwgK bs|†nvwìs UvBc                        |†gvU Zjv     |msL¨v  "
+    lstvAssess.ListItems.Clear
+    If txtHTaxNo.Enabled And txtHTaxNo.Visible Then txtHTaxNo.SetFocus
+    valueInitializer
+    
+End Sub

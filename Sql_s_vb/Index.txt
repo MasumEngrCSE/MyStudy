@@ -1,0 +1,2 @@
+create index ind_sales_mem_code on sales(mem_code)
+DROP INDEX sales.ind_sales_mem_code

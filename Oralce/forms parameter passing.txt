@@ -1,0 +1,18 @@
+declare
+		 pl_id ParamList; 
+
+BEGIN 
+	  pl_id := Get_Parameter_List('tmpdata'); 
+	   IF NOT Id_Null(pl_id) THEN 
+	   	   Destroy_Parameter_List( pl_id ); 
+	   END IF; 
+  pl_id := Create_Parameter_List('tmpdata'); 
+
+  Add_Parameter(pl_id,'PM_VN',TEXT_PARAMETER,:PARAMETER.PM_LVN); 
+  
+  call_form('DCS_M13',no_hide,do_replace,no_query_only,pl_id);													
+
+exception
+	when others then message(sqlerrm);
+									message(sqlerrm);
+END;
